@@ -41,4 +41,5 @@ stock-management-system-app est une application de gestion des stocks qui permet
   - l'application offre un etat d'avancement des commandes
     
   - l'application doit etre securiser avec un system d'authentification
+  - l'application offre une fonctionnalitee de recherche sur les modules client,artcle, etc...
      
