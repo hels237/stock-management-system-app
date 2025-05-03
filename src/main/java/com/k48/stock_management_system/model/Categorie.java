@@ -1,6 +1,7 @@
 package com.k48.stock_management_system.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,14 +14,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Fournisseur extends AbstractEntity {
+public class Categorie extends AbstractEntity{
 
-    private String nom;
-    private String prenom;
-    private String email;
-    private String photo;
-    private String numTelephone;
+    private String code;
+    private String designation;
+    private String description;
 
-    @OneToMany(mappedBy = "fournisseur")
-    private List<CmdeFournisseur> CmdeFournisseurs;
+    @OneToMany(mappedBy = "categorie")
+    private List<Article> articles;
 }

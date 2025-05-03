@@ -1,4 +1,45 @@
 package com.k48.stock_management_system.model;
 
-public class Article {
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+public class Article extends AbstractEntity{
+
+    private String codeArticle;
+    private String designation;
+    private BigDecimal prixUnitaireHT;
+    private BigDecimal tauxTva;
+    private BigDecimal prixUnitaireTTc;
+    @Column(name = "urlPhoto")
+    private String Photo;
+
+    @ManyToOne
+    @JoinColumn(name = "categorieId")
+    private Categorie categorie;
+
+    @ManyToOne
+    @JoinColumn(name = "entrepriseId")
+    private Entreprise entreprise;
+
+    @OneToMany(mappedBy = "article")
+    private List<LigneCmdeClient> ligneCmdeClients;
+
+    @OneToMany(mappedBy = "article")
+    private List<LigneCmdeFournisseur> ligneCmdeFournisseur;
+
+    @OneToMany(mappedBy ="article")
+    private List<MvtStock> mvtStock;
+
+
 }
