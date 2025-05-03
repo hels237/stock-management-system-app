@@ -5,25 +5,26 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 public class Client extends AbstractEntity {
+
     private String nom;
     private String prenom;
     private String email;
+
     @Column(name = "urlImage")
     private String photo;
-    @Column(name = "telephone")
+
+    @Column(name = "Tel")
     private String numTelephone;
 
     @Embedded
