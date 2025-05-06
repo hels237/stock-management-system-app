@@ -3,7 +3,6 @@ package com.k48.stock_management_system.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.*;
 
 import java.math.BigDecimal;

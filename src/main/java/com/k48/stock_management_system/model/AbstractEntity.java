@@ -2,13 +2,18 @@ package com.k48.stock_management_system.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Date;
 
-
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public class AbstractEntity {
