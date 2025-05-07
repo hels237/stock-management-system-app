@@ -14,10 +14,15 @@ import java.util.List;
 public class Article extends AbstractEntity{
 
     private String codeArticle;
+
     private String designation;
+
     private BigDecimal prixUnitaireHT;
+
     private BigDecimal tauxTva;
+
     private BigDecimal prixUnitaireTTc;
+
     @Column(name = "urlPhoto")
     private String Photo;
 

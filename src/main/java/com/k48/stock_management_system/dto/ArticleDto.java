@@ -2,6 +2,7 @@ package com.k48.stock_management_system.dto;
 
 
 import com.k48.stock_management_system.model.Article;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,12 +17,14 @@ public class ArticleDto {
 
     private String codeArticle;
 
+    @NotNull
     private String designation;
 
     private BigDecimal prixUnitaireHT;
 
     private BigDecimal tauxTva;
 
+    @NotNull
     private BigDecimal prixUnitaireTTc;
 
     private String Photo;

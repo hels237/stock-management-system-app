@@ -6,11 +6,10 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
-@SuperBuilder
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor

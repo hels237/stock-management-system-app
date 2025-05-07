@@ -2,6 +2,7 @@ package com.k48.stock_management_system.dto;
 
 
 import com.k48.stock_management_system.model.Adresse;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,12 +11,15 @@ import lombok.Setter;
 @Builder
 public class AdresseDto {
 
+    @NotNull
     private String adresse1;
 
     private String adresse2;
 
+    @NotNull
     private String ville;
 
+    @NotNull
     private String pays;
 
     private String codePostal;

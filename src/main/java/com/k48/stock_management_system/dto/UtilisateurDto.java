@@ -1,7 +1,8 @@
 package com.k48.stock_management_system.dto;
 
-import com.k48.stock_management_system.model.Fournisseur;
 import com.k48.stock_management_system.model.Utilisateur;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,15 +11,22 @@ import lombok.Setter;
 @Builder
 public class UtilisateurDto {
 
+    @NotNull(message = "please fill the field")
     private String nom;
 
+    @NotNull
     private String prenom;
 
+    @Email
     private String email;
 
     private String photo;
 
-    //private String motDePasse;
+    @NotNull
+    private String motDePasse;
+
+    @NotNull
+    private AdresseDto adresseDto;
 
     private EntrepriseDto entrepriseDto;
 
@@ -34,6 +42,7 @@ public class UtilisateurDto {
                 .nom(utilisateur.getNom())
                 .email(utilisateur.getEmail())
                 .prenom(utilisateur.getPrenom())
+                .adresseDto(AdresseDto.toDto(utilisateur.getAdresse()))
                 .build();
     }
 
@@ -47,6 +56,7 @@ public class UtilisateurDto {
                 .nom(utilisateurDto.getNom())
                 .prenom(utilisateurDto.getPrenom())
                 .email(utilisateurDto.getEmail())
+                .adresse(AdresseDto.toEntity(utilisateurDto.getAdresseDto()))
                 .build();
     }
 
