@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface CmdeClientRepository extends JpaRepository<CmdeClient,Integer> {
 
     Optional<CmdeClient> findByClientId(Integer id);
+
+    Optional<CmdeClient> findByCode(String codeCmdeClient);
 }
