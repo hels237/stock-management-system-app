@@ -7,6 +7,7 @@ import com.k48.stock_management_system.exceptions.ObjectValidationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 
@@ -14,7 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class GlobalHandllerException extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<?> handler(EntityNotFoundException exception){
+    public ResponseEntity<?> handler(EntityNotFoundException exception,WebRequest webRequest){
 
         ErrorResponse errorResponse =
                 ErrorResponse
@@ -28,7 +29,7 @@ public class GlobalHandllerException extends ResponseEntityExceptionHandler {
 
 
     @ExceptionHandler(ObjectValidationException.class)
-    public ResponseEntity<?> handler(ObjectValidationException exception){
+    public ResponseEntity<?> handler(ObjectValidationException exception,WebRequest webRequest){
         ErrorResponse errorResponse =
                 ErrorResponse
                         .builder()
@@ -40,7 +41,7 @@ public class GlobalHandllerException extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(InvalidOperationException.class)
-    public ResponseEntity<?> handler(InvalidOperationException exception){
+    public ResponseEntity<?> handler(InvalidOperationException exception,WebRequest webRequest){
         ErrorResponse errorResponse =
                     ErrorResponse
                             .builder()

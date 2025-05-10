@@ -11,7 +11,7 @@ import java.util.Set;
 @Getter @Setter
 @Builder
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ErrorResponse {
     private String message;
     private String source;
