@@ -11,6 +11,8 @@ import java.util.List;
 @Builder
 public class CategirieDto {
 
+    private Integer categorieId;
+
     private String code;
 
     private String designation;

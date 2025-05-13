@@ -4,12 +4,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
 
-@Builder
+@SuperBuilder
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor

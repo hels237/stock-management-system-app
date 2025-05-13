@@ -5,12 +5,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 import java.util.List;
 
 
-@Builder
+@SuperBuilder
 @Getter
 @Setter
 @NoArgsConstructor

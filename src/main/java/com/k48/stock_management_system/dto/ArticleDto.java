@@ -15,6 +15,7 @@ import java.util.List;
 @Builder
 public class ArticleDto {
 
+    @NotNull
     private String codeArticle;
 
     @NotNull
@@ -24,10 +25,11 @@ public class ArticleDto {
 
     private BigDecimal tauxTva;
 
-    @NotNull
     private BigDecimal prixUnitaireTTc;
 
     private String Photo;
+
+    //private Integer categoryId;
 
     private CategirieDto categirieDto;
 
@@ -53,7 +55,7 @@ public class ArticleDto {
                 .prixUnitaireHT(articleDto.getPrixUnitaireHT())
                 .tauxTva(articleDto.getTauxTva())
                 .prixUnitaireTTc(articleDto.getPrixUnitaireTTc())
-                .categorie(CategirieDto.toEntity(articleDto.categirieDto))
+                .categorie(CategirieDto.toEntity(articleDto.getCategirieDto()))
                 .build();
     }
 

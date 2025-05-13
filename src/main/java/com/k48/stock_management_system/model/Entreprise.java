@@ -4,11 +4,12 @@ package com.k48.stock_management_system.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 
-@Builder
+@SuperBuilder
 @Getter
 @Setter
 @NoArgsConstructor
