@@ -10,8 +10,10 @@ import com.k48.stock_management_system.validator.ObjectValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+
 import java.util.List;
 import java.util.Optional;
+
 
 
 @Service
@@ -63,22 +65,6 @@ public abstract class ArticleServiceImpl implements ArticleService {
                         .orElseThrow(
                                 ()-> new EntityNotFoundException("Article with code " + codeArticle + " not found")
                         );
-    }
-
-    @Override
-    public List<ArticleDto> findAllByDesignation(String designation) {
-
-        List<Article> articles = articleRepository.findByDesignation(designation);
-
-//Optionnal.of() permet d'eviter les li
-        return
-                Optional.of(articles)
-                        .filter(list-> !list.isEmpty())
-                        .orElseThrow(
-                            ()-> new EntityNotFoundException("Aucun article trouvé avec la désignation: " + designation))
-                        .stream()
-                        .map(ArticleDto::toDto)
-                        .toList();
     }
 
 
