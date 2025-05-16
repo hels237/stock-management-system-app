@@ -11,6 +11,6 @@ public interface ArticleService extends AbstractService<ArticleDto> {
     ArticleDto findByCodeArticle(String codeArticle);
     List<ArticleDto> findAll();
 
-    void delete(Integer id);
+    ArticleDto delete(Integer id);
 
 }

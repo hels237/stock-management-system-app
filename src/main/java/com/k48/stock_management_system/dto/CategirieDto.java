@@ -1,6 +1,8 @@
 package com.k48.stock_management_system.dto;
 
 import com.k48.stock_management_system.model.Categorie;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,8 +15,10 @@ public class CategirieDto {
 
     private Integer categorieId;
 
+    @NotNull
     private String code;
 
+    @NotNull
     private String designation;
 
     private String description;

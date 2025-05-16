@@ -3,12 +3,14 @@ package com.k48.stock_management_system.services.impl;
 
 import com.k48.stock_management_system.dto.ArticleDto;
 import com.k48.stock_management_system.exceptions.EntityNotFoundException;
+import com.k48.stock_management_system.exceptions.ErrorCode;
 import com.k48.stock_management_system.model.Article;
 import com.k48.stock_management_system.repositories.ArticleRepository;
 import com.k48.stock_management_system.services.ArticleService;
 import com.k48.stock_management_system.validator.ObjectValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 
 import java.util.List;
@@ -46,7 +48,7 @@ public abstract class ArticleServiceImpl implements ArticleService {
                         .findById(id)
                         .map(ArticleDto::toDto)
                         .orElseThrow(
-                                ()->  new EntityNotFoundException("Article with id " + id + " not found")
+                                ()->  new EntityNotFoundException("Article with id " + id + " not found"    )
                         ) ;
 
     }
@@ -77,7 +79,7 @@ public abstract class ArticleServiceImpl implements ArticleService {
                 Optional.of(articles)
                         .filter(list-> !list.isEmpty())
                         .orElseThrow(
-                                ()-> new EntityNotFoundException(" article not found ! ")
+                                ()-> new EntityNotFoundException(" article not found ! "+ ErrorCode.ARTICLE_NOT_FOUND)
                         )
                         .stream()
                         .map(ArticleDto::toDto)
@@ -87,13 +89,20 @@ public abstract class ArticleServiceImpl implements ArticleService {
 
 
     @Override
-    public void delete(Integer id) {
+    public ArticleDto delete(Integer id) {
 
         if(id == null) {
-            return ;
+            return null;
         }
-        articleRepository.deleteById(id);
+        Article article =
+                articleRepository
+                        .findById(id)
+                        .orElseThrow(
+                                ()-> new EntityNotFoundException("Article with id " + id + " not found")
+                        );
+        articleRepository.delete(article);
 
+        return ArticleDto.toDto(article);
     }
 
 }

@@ -7,5 +7,5 @@ public interface AbstractService<T> {
     T save(T oobject);
     T findById(Integer id);
     List<T> findAll();
-    T deleteById(Integer id);
+    T delete(Integer id);
 }

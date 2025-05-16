@@ -38,16 +38,17 @@ public class FournisseurDto {
                 .build();
     }
 
-    public static FournisseurDto toEntity(Fournisseur fournisseur) {
+    public static Fournisseur toEntity(FournisseurDto fournisseurDto) {
 
-        if(fournisseur == null){
+        if(fournisseurDto == null){
             return null;
         }
-        return FournisseurDto.
+
+        return Fournisseur.
                 builder()
-                .nom(fournisseur.getNom())
-                .prenom(fournisseur.getPrenom())
-                .email(fournisseur.getEmail())
+                .nom(fournisseurDto.getNom())
+                .prenom(fournisseurDto.getPrenom())
+                .email(fournisseurDto.getEmail())
                 .build();
     }
 }
