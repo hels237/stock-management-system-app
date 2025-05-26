@@ -21,8 +21,6 @@ public class ArticleController {
 
 
 
-
-
     @PostMapping(value = "/create",consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
     public  ResponseEntity<?> saveArticle(@RequestBody ArticleDto  articleDto){
         return ResponseEntity.ok(articleService.save(articleDto));

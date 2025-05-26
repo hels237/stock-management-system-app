@@ -2,11 +2,13 @@ package com.k48.stock_management_system.services.impl;
 
 import com.k48.stock_management_system.dto.UtilisateurDto;
 import com.k48.stock_management_system.exceptions.EntityNotFoundException;
+import com.k48.stock_management_system.exceptions.ErrorCode;
 import com.k48.stock_management_system.model.Utilisateur;
 import com.k48.stock_management_system.repositories.UtilisateurRepository;
 import com.k48.stock_management_system.services.UtilisateurService;
 import com.k48.stock_management_system.validator.ObjectValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.integration.IntegrationProperties;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,9 +47,15 @@ public class UtilissateurServiceImpl  implements UtilisateurService {
     @Override
     public List<UtilisateurDto> findAll() {
         List<Utilisateur> utilisateurs = utilisateurRepository.findAll();
-        return Optional.of(utilisateurs).filter(list-> !list.isEmpty()).orElseThrow(
-                ()-> new EntityNotFoundException("EMPTY List")
-        ).stream().map(UtilisateurDto::toDto).toList();
+
+        return Optional.of(utilisateurs)
+                .filter(list-> !list.isEmpty())
+                .orElseThrow(
+                    ()-> new EntityNotFoundException("{} EMPTY List"+ ErrorCode.EMPTY_LIST)
+                )
+                .stream()
+                .map(UtilisateurDto::toDto)
+                .toList();
     }
 
     @Override

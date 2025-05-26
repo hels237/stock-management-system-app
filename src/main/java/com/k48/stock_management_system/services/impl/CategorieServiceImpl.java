@@ -9,11 +9,13 @@ import com.k48.stock_management_system.repositories.CategorieRepository;
 import com.k48.stock_management_system.services.CategorieService;
 import com.k48.stock_management_system.validator.ObjectValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CategorieServiceImpl implements CategorieService {
@@ -32,7 +34,7 @@ public class CategorieServiceImpl implements CategorieService {
     @Override
     public CategirieDto findById(Integer id) {
         if(id == null) {
-            return null;
+            log.error("id is null");
         }
 
         return
@@ -65,7 +67,7 @@ public class CategorieServiceImpl implements CategorieService {
     public CategirieDto delete(Integer id) {
 
         if(id == null) {
-            return null;
+            log.error("0==) id: "+id +"is null");
         }
         Categorie categorie = categorieRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("category with ID " + id + " not found"));
         categorieRepository.delete(categorie);
