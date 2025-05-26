@@ -73,4 +73,20 @@ public class CategorieServiceImpl implements CategorieService {
         categorieRepository.delete(categorie);
         return CategirieDto.toDto(categorie);
     }
+
+    @Override
+    public CategirieDto findByCode(String code) {
+        if(code == null) {
+            log.error("code is null !");
+        }
+
+        return
+                categorieRepository
+                        .findByCode(code)
+                        .map(CategirieDto::toDto)
+                        .orElseThrow(
+                                ()-> new EntityNotFoundException("category with id "+code+" not found")
+                        );
+
+    }
 }
