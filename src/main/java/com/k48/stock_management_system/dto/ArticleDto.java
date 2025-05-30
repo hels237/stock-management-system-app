@@ -15,6 +15,8 @@ import java.util.List;
 @Builder
 public class ArticleDto {
 
+    private Integer id;
+
     @NotNull
     private String codeArticle;
 

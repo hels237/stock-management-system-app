@@ -14,6 +14,8 @@ import java.util.List;
 @Builder
 public class CmdeClientDto {
 
+    private Integer id;
+
     private String code;
 
     private Instant dateCmde;

@@ -1,5 +1,6 @@
 package com.k48.stock_management_system.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.k48.stock_management_system.model.CmdeClient;
 import com.k48.stock_management_system.model.LigneCmdeClient;
 import lombok.Builder;
@@ -12,10 +13,13 @@ import java.math.BigDecimal;
 @Builder
 public class LigneCmdeClientDto {
 
+    private Integer id;
+
     private BigDecimal prixUnitaire;
 
     private BigDecimal quantite;
 
+    @JsonIgnore
     private CmdeClient cmdeClient;
 
     private ArticleDto articleDto;

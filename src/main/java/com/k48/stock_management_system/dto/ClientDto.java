@@ -13,6 +13,8 @@ import java.util.List;
 @SuperBuilder
 public class ClientDto {
 
+    private Integer id;
+
     private String nom;
 
     private String prenom;
