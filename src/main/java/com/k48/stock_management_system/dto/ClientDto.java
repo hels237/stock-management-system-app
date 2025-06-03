@@ -23,6 +23,8 @@ public class ClientDto {
 
     private String photo;
 
+    private Integer entrepriseId;
+
     private String numTelephone;
 
     private AdresseDto adresseDto;

@@ -21,12 +21,15 @@ public class CmdeFournisseurDto {
 
     private List<LigneCmdeFournisseurDto> ligneCmdeFournisseurDtos;
 
+    private Integer entrepriseId;
+
 
     public static CmdeFournisseurDto toDto(CmdeFournisseur cmdeFournisseur) {
 
         if(cmdeFournisseur== null){
             return null;
         }
+
         return CmdeFournisseurDto.
                 builder()
                 .code(cmdeFournisseur.getCode())

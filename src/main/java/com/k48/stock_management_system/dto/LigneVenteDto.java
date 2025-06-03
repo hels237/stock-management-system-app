@@ -20,6 +20,8 @@ public class LigneVenteDto {
 
     private Article article;
 
+    private Integer entrepriseId;
+
 
     public static LigneVenteDto toDto(LigneVente ligneVente){
         if(ligneVente == null){

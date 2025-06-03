@@ -26,6 +26,8 @@ public class FournisseurDto {
 
     private List<CmdeFournisseurDto> CmdeFournisseurDtos;
 
+    private Integer entrepriseId;
+
 
     public static FournisseurDto toDto(Fournisseur fournisseur) {
 

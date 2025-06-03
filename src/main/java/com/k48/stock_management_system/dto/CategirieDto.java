@@ -23,6 +23,8 @@ public class CategirieDto {
 
     private String description;
 
+    private Integer entrepriseId;
+
     private List<ArticleDto> articleDtos;
 
 

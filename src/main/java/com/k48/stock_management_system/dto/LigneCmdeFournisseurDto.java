@@ -25,6 +25,8 @@ public class LigneCmdeFournisseurDto {
 
     private ArticleDto articleDto;
 
+    private Integer entrepriseId;
+
 
 
 

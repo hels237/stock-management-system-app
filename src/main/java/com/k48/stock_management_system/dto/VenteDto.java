@@ -25,6 +25,8 @@ public class VenteDto {
 
     private List<LigneVente> ligneVentes;
 
+    private Integer entrepriseId;
+
 
     public static VenteDto toDto(Vente vente) {
         if(vente == null) {

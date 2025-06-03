@@ -24,6 +24,8 @@ public class LigneCmdeClientDto {
 
     private ArticleDto articleDto;
 
+    private Integer entrepriseId;
+
 
     public static LigneCmdeClientDto toDto(LigneCmdeClient ligneCmdeClient) {
 

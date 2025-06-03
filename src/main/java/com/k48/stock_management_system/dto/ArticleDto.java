@@ -31,6 +31,8 @@ public class ArticleDto {
 
     private String Photo;
 
+    private Integer entrepriseId;
+
     //private Integer categoryId;
 
     private CategirieDto categirieDto;

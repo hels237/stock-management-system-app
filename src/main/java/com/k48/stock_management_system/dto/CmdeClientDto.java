@@ -22,6 +22,8 @@ public class CmdeClientDto {
 
     private ClientDto clientDto;
 
+    private Integer entrepriseId;
+
     private List<LigneCmdeClientDto> ligneCmdeClientDtos;
 
 
