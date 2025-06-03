@@ -15,10 +15,16 @@ import java.util.List;
 public class Fournisseur extends AbstractEntity {
 
     private String nom;
+
     private String prenom;
+
     private String email;
+
     private String photo;
+
     private String numTelephone;
+
+    private Integer entrepriseId;
 
     @OneToMany(mappedBy = "fournisseur")
     private List<CmdeFournisseur> CmdeFournisseurs;

@@ -17,9 +17,15 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 public class Vente extends AbstractEntity{
+
     private String code;
+
     private String commentaire;
+
     private Instant dateVente;
+
+    private Integer entrepriseId;
+
 
     @OneToMany(mappedBy = "vente")
     private List<LigneVente> ligneVentes;

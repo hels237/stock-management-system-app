@@ -19,8 +19,12 @@ import java.util.List;
 public class Client extends AbstractEntity {
 
     private String nom;
+
     private String prenom;
+
     private String email;
+
+    private Integer entrepriseId;
 
     @Column(name = "urlImage")
     private String photo;

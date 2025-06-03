@@ -1,5 +1,6 @@
 package com.k48.stock_management_system.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.k48.stock_management_system.model.Article;
 import com.k48.stock_management_system.model.LigneCmdeClient;
 import com.k48.stock_management_system.model.LigneCmdeFournisseur;
@@ -13,13 +14,16 @@ import java.math.BigDecimal;
 @Builder
 public class LigneCmdeFournisseurDto {
 
+    private Integer id;
+
     private BigDecimal prixUnitaire;
 
     private BigDecimal quantite;
 
-    private Integer cmdeFournisseurId;
+    @JsonIgnore
+    private CmdeFournisseurDto cmdeFournisseurDto;
 
-    private Article articleId;
+    private ArticleDto articleDto;
 
 
 
@@ -33,6 +37,7 @@ public class LigneCmdeFournisseurDto {
                 .builder()
                 .prixUnitaire(ligneCmdeFournisseur.getPrixUnitaire())
                 .quantite(ligneCmdeFournisseur.getQuantite())
+                .articleDto(ArticleDto.toDto(ligneCmdeFournisseur.getArticle()))
                 .build();
     }
 
@@ -45,6 +50,7 @@ public class LigneCmdeFournisseurDto {
                 .builder()
                 .prixUnitaire(ligneCmdeFournisseurDto.getPrixUnitaire())
                 .quantite(ligneCmdeFournisseurDto.getQuantite())
+                .article(ArticleDto.toEntity(ligneCmdeFournisseurDto.getArticleDto()))
                 .build();
     }
 }

@@ -20,7 +20,10 @@ import java.util.List;
 public class CmdeClient extends AbstractEntity {
 
     private String code;
+
     private Instant dateCmde;
+
+    private Integer entrepriseId;
 
     @ManyToOne
     @JoinColumn(name = "clientId")

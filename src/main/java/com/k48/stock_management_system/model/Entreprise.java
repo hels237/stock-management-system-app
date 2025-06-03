@@ -18,13 +18,22 @@ import java.util.List;
 public class Entreprise extends AbstractEntity {
 
     private String nom;
+
     private String description;
+
     private Adresse adresse;
+
     private String codeFiscal;
+
     private String photo;
+
     private String email;
+
     private String numTelephone;
+
     private String siteWeb;
+
+    private Integer entrepriseId;
 
     @OneToMany(mappedBy = "entreprise")
     private List<Utilisateur> utilisateurs;

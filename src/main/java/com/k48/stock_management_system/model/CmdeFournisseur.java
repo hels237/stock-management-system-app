@@ -19,7 +19,10 @@ import java.util.List;
 public class CmdeFournisseur  extends AbstractEntity {
 
     private String code;
+
     private Instant dateCmde;
+
+    private Integer entrepriseId;
 
     @ManyToOne
     @JoinColumn(name = "fournisseurId")

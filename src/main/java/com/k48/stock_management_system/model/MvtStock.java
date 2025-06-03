@@ -16,8 +16,12 @@ import java.time.Instant;
 @AllArgsConstructor
 @Entity
 public class MvtStock extends AbstractEntity {
+
     private Instant dateMvt;
+
     private BigDecimal quantite;
+
+    private Integer entrepriseId;
 
     @ManyToOne
     @JoinColumn(name = "mvtStockId")

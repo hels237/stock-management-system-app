@@ -16,9 +16,9 @@ import com.k48.stock_management_system.validator.ObjectValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -69,7 +69,7 @@ public class CmdeClientServiceImpl implements CmdeClientService {
         // if everything is good save the cmdClient
         CmdeClient cmdeClient = cmdeClientRepository.save(CmdeClientDto.toEntity(cmdeClientDto));
 
-        // save the LineCmdClient
+        // save the LineCmdClient we can't persist the ligneCmdeClient without knowing  whose cmdClient it's belong to
         if(cmdeClientDto.getLigneCmdeClientDtos() != null) {
 
             cmdeClientDto.getLigneCmdeClientDtos().forEach(ligCmdClt ->{

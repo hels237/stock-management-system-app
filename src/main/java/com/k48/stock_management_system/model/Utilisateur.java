@@ -27,6 +27,8 @@ public class Utilisateur extends AbstractEntity {
 
     private String motDePasse;
 
+    private Integer entrepriseId;
+
     @Embedded
     private Adresse adresse;
 
