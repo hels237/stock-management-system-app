@@ -22,7 +22,7 @@ public class CmdeFournisseur  extends AbstractEntity {
 
     private Instant dateCmde;
 
-    private Integer entrepriseId;
+    private Integer idEntreprise;
 
     @ManyToOne
     @JoinColumn(name = "fournisseurId")

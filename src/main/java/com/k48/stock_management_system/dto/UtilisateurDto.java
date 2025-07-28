@@ -30,6 +30,8 @@ public class UtilisateurDto {
 
     private EntrepriseDto entrepriseDto;
 
+    private Integer entrepriseId;
+
 
 
     public static UtilisateurDto toDto(Utilisateur utilisateur) {
@@ -43,6 +45,8 @@ public class UtilisateurDto {
                 .email(utilisateur.getEmail())
                 .prenom(utilisateur.getPrenom())
                 .adresseDto(AdresseDto.toDto(utilisateur.getAdresse()))
+                .entrepriseId(utilisateur.getIdEntreprise())
+                .entrepriseDto(EntrepriseDto.toDto(utilisateur.getEntreprise()))
                 .build();
     }
 
@@ -57,6 +61,8 @@ public class UtilisateurDto {
                 .prenom(utilisateurDto.getPrenom())
                 .email(utilisateurDto.getEmail())
                 .adresse(AdresseDto.toEntity(utilisateurDto.getAdresseDto()))
+                .idEntreprise(utilisateurDto.getEntrepriseId())
+                .entreprise(EntrepriseDto.toEntity(utilisateurDto.entrepriseDto))
                 .build();
     }
 

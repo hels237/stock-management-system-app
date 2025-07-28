@@ -39,6 +39,7 @@ public class FournisseurDto {
                 .nom(fournisseur.getNom())
                 .email(fournisseur.getEmail())
                 .prenom(fournisseur.getPrenom())
+                .entrepriseId(fournisseur.getIdEntreprise())
                 .build();
     }
 
@@ -53,6 +54,7 @@ public class FournisseurDto {
                 .nom(fournisseurDto.getNom())
                 .prenom(fournisseurDto.getPrenom())
                 .email(fournisseurDto.getEmail())
+                .idEntreprise(fournisseurDto.getEntrepriseId())
                 .build();
     }
 }

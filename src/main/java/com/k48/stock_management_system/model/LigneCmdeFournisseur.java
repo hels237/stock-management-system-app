@@ -20,7 +20,7 @@ public class LigneCmdeFournisseur extends AbstractEntity {
 
     private BigDecimal quantite;
 
-    private Integer entrepriseId;
+    private Integer idEntreprise;
 
     @ManyToOne
     @JoinColumn(name = "cmdeFournisseurId")

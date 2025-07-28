@@ -32,6 +32,7 @@ public class MvtStockDto {
                 .dateMvt(mvtStock.getDateMvt())
                 .quantite(mvtStock.getQuantite())
                 .articleDto(ArticleDto.toDto(mvtStock.getArticle()))
+                .entrepriseId(mvtStock.getIdEntreprise())
                 .build();
     }
 
@@ -45,6 +46,7 @@ public class MvtStockDto {
                 .quantite(mvtStockDto.getQuantite())
                 .dateMvt(Instant.now())
                 .article(ArticleDto.toEntity(mvtStockDto.getArticleDto()))
+                .idEntreprise(mvtStockDto.getEntrepriseId())
                 .build();
     }
 }

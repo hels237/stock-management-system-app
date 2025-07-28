@@ -31,6 +31,7 @@ public class LigneVenteDto {
                 .builder()
                 .prixUnitaire(ligneVente.getPrixUnitaire())
                 .quantite(ligneVente.getQuantite())
+                .entrepriseId(ligneVente.getIdEntreprise())
                 .build();
     }
 
@@ -43,6 +44,7 @@ public class LigneVenteDto {
                 .builder()
                 .prixUnitaire(ligneVenteDto.getPrixUnitaire())
                 .quantite(ligneVenteDto.getQuantite())
+                .idEntreprise(ligneVenteDto.getEntrepriseId())
                 .build();
     }
 

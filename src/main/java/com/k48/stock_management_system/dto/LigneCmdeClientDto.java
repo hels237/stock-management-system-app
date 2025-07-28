@@ -36,6 +36,7 @@ public class LigneCmdeClientDto {
                 .builder()
                 .prixUnitaire(ligneCmdeClient.getPrixUnitaire())
                 .quantite(ligneCmdeClient.getQuantite())
+                .entrepriseId(ligneCmdeClient.getIdEntreprise())
                 .build();
     }
 
@@ -48,6 +49,7 @@ public class LigneCmdeClientDto {
                 .builder()
                 .prixUnitaire(ligneCmdeClientDto.getPrixUnitaire())
                 .quantite(ligneCmdeClientDto.getQuantite())
+                .idEntreprise(ligneCmdeClientDto.getEntrepriseId())
                 .build();
     }
 }

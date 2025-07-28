@@ -34,6 +34,7 @@ public class CmdeFournisseurDto {
                 builder()
                 .code(cmdeFournisseur.getCode())
                 .dateCmde(cmdeFournisseur.getDateCmde())
+                .entrepriseId(cmdeFournisseur.getIdEntreprise())
                 .build();
     }
 
@@ -46,6 +47,7 @@ public class CmdeFournisseurDto {
                 builder()
                 .code(cmdeFournisseurDto.getCode())
                 .dateCmde(cmdeFournisseurDto.getDateCmde())
+                .idEntreprise(cmdeFournisseurDto.getEntrepriseId())
                 .build();
     }
 

@@ -24,7 +24,7 @@ public class Vente extends AbstractEntity{
 
     private Instant dateVente;
 
-    private Integer entrepriseId;
+    private Integer idEntreprise;
 
 
     @OneToMany(mappedBy = "vente")

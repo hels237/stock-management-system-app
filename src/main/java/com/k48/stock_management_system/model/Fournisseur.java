@@ -24,7 +24,7 @@ public class Fournisseur extends AbstractEntity {
 
     private String numTelephone;
 
-    private Integer entrepriseId;
+    private Integer idEntreprise;
 
     @OneToMany(mappedBy = "fournisseur")
     private List<CmdeFournisseur> CmdeFournisseurs;

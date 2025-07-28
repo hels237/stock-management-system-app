@@ -39,6 +39,7 @@ public class CategirieDto {
                 .code(categirieDto.getCode())
                 .description(categirieDto.getDescription())
                 .designation(categirieDto.getDesignation())
+                .idEntreprise(categirieDto.getEntrepriseId())
                 .articles(categirieDto.articleDtos.stream().map(ArticleDto::toEntity).toList())
                 .build();
     }
@@ -53,6 +54,7 @@ public class CategirieDto {
                 .code(categorie.getCode())
                 .description(categorie.getDescription())
                 .designation(categorie.getDesignation())
+                .entrepriseId(categorie.getIdEntreprise())
                 .articleDtos(categorie.getArticles().stream().map(ArticleDto::toDto).toList())
                 .build();
 

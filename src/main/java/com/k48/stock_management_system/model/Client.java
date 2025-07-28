@@ -24,7 +24,7 @@ public class Client extends AbstractEntity {
 
     private String email;
 
-    private Integer entrepriseId;
+    private Integer idEntreprise;
 
     @Column(name = "urlImage")
     private String photo;

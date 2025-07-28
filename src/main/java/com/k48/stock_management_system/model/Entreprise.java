@@ -33,7 +33,6 @@ public class Entreprise extends AbstractEntity {
 
     private String siteWeb;
 
-    private Integer entrepriseId;
 
     @OneToMany(mappedBy = "entreprise")
     private List<Utilisateur> utilisateurs;

@@ -37,6 +37,7 @@ public class CmdeClientDto {
                 .client(ClientDto.toEntity(cmdeClientDto.getClientDto()))
                 .code(cmdeClientDto.getCode())
                 .dateCmde(cmdeClientDto.getDateCmde())
+                .idEntreprise(cmdeClientDto.getEntrepriseId())
                 .build();
     }
 
@@ -49,6 +50,7 @@ public class CmdeClientDto {
                 .clientDto(ClientDto.toDto(cmdeClient.getClient()))
                 .code(cmdeClient.getCode())
                 .dateCmde(cmdeClient.getDateCmde())
+                .entrepriseId(cmdeClient.getIdEntreprise())
                 .build();
     }
 

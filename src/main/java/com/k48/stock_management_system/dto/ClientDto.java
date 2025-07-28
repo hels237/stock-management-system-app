@@ -44,6 +44,7 @@ public class ClientDto {
                 .prenom(clientDto.getPrenom())
                 .email(clientDto.getEmail())
                 .numTelephone(clientDto.getNumTelephone())
+                .idEntreprise(clientDto.getEntrepriseId())
                 .build();
     }
 
@@ -58,6 +59,7 @@ public class ClientDto {
                 .email(client.getEmail())
                 .adresseDto(AdresseDto.toDto(client.getAdresse()))
                 .numTelephone(client.getNumTelephone())
+                .entrepriseId(client.getIdEntreprise())
                 .build();
     }
 }

@@ -40,6 +40,7 @@ public class LigneCmdeFournisseurDto {
                 .prixUnitaire(ligneCmdeFournisseur.getPrixUnitaire())
                 .quantite(ligneCmdeFournisseur.getQuantite())
                 .articleDto(ArticleDto.toDto(ligneCmdeFournisseur.getArticle()))
+                .entrepriseId(ligneCmdeFournisseur.getIdEntreprise())
                 .build();
     }
 
@@ -53,6 +54,7 @@ public class LigneCmdeFournisseurDto {
                 .prixUnitaire(ligneCmdeFournisseurDto.getPrixUnitaire())
                 .quantite(ligneCmdeFournisseurDto.getQuantite())
                 .article(ArticleDto.toEntity(ligneCmdeFournisseurDto.getArticleDto()))
+                .idEntreprise(ligneCmdeFournisseurDto.getEntrepriseId())
                 .build();
     }
 }

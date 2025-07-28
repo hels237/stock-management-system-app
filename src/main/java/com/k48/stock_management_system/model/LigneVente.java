@@ -19,7 +19,7 @@ public class LigneVente extends AbstractEntity {
 
     private BigDecimal quantite;
 
-    private Integer entrepriseId;
+    private Integer idEntreprise;
 
     @ManyToOne
     @JoinColumn(name = "venteId")

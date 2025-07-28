@@ -23,7 +23,7 @@ public class CmdeClient extends AbstractEntity {
 
     private Instant dateCmde;
 
-    private Integer entrepriseId;
+    private Integer idEntreprise;
 
     @ManyToOne
     @JoinColumn(name = "clientId")
