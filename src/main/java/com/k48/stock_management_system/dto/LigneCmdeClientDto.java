@@ -27,12 +27,13 @@ public class LigneCmdeClientDto {
     private Integer entrepriseId;
 
 
-    public static LigneCmdeClientDto toDto(LigneCmdeClient ligneCmdeClient) {
+    public static LigneCmdeClientDto fromEntity(LigneCmdeClient ligneCmdeClient) {
 
         if(ligneCmdeClient == null) {
             return null;
         }
         return LigneCmdeClientDto
+
                 .builder()
                 .prixUnitaire(ligneCmdeClient.getPrixUnitaire())
                 .quantite(ligneCmdeClient.getQuantite())

@@ -24,6 +24,6 @@ public class MvtStock extends AbstractEntity {
     private Integer idEntreprise;
 
     @ManyToOne
-    @JoinColumn(name = "mvtStockId")
+    @JoinColumn(name = "articleId")
     private Article article;;
 }

@@ -23,7 +23,7 @@ public class LigneVenteDto {
     private Integer entrepriseId;
 
 
-    public static LigneVenteDto toDto(LigneVente ligneVente){
+    public static LigneVenteDto fromEntity(LigneVente ligneVente){
         if(ligneVente == null){
             return null;
         }

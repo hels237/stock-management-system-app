@@ -5,7 +5,7 @@ import com.k48.stock_management_system.dto.CategirieDto;
 import com.k48.stock_management_system.exceptions.EntityNotFoundException;
 import com.k48.stock_management_system.exceptions.ErrorCode;
 import com.k48.stock_management_system.model.Categorie;
-import com.k48.stock_management_system.repositories.CategorieRepository;
+import com.k48.stock_management_system.repositories.CategoryRepository;
 import com.k48.stock_management_system.services.CategorieService;
 import com.k48.stock_management_system.validator.ObjectValidator;
 import lombok.RequiredArgsConstructor;
@@ -21,14 +21,14 @@ import java.util.Optional;
 public class CategorieServiceImpl implements CategorieService {
 
     private final ObjectValidator<CategirieDto> objectValidator;
-    private final CategorieRepository  categorieRepository;
+    private final CategoryRepository categoryRepository;
 
 
     @Override
     public CategirieDto save(CategirieDto categirieDto) {
 
         objectValidator.validate(categirieDto);
-        return CategirieDto.toDto(categorieRepository.save(CategirieDto.toEntity(categirieDto)));
+        return CategirieDto.toDto(categoryRepository.save(CategirieDto.toEntity(categirieDto)));
     }
 
     @Override
@@ -38,7 +38,7 @@ public class CategorieServiceImpl implements CategorieService {
         }
 
         return
-                categorieRepository
+                categoryRepository
                         .findById(id)
                         .map(CategirieDto::toDto)
                         .orElseThrow(
@@ -50,7 +50,7 @@ public class CategorieServiceImpl implements CategorieService {
     @Override
     public List<CategirieDto> findAll() {
 
-        List<Categorie> categories = categorieRepository.findAll();
+        List<Categorie> categories = categoryRepository.findAll();
 
         return
                 Optional.of(categories)
@@ -69,8 +69,8 @@ public class CategorieServiceImpl implements CategorieService {
         if(id == null) {
             log.error("0==) id: "+id +"is null");
         }
-        Categorie categorie = categorieRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("category with ID " + id + " not found"));
-        categorieRepository.delete(categorie);
+        Categorie categorie = categoryRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("category with ID " + id + " not found"));
+        categoryRepository.delete(categorie);
         return CategirieDto.toDto(categorie);
     }
 
@@ -81,7 +81,7 @@ public class CategorieServiceImpl implements CategorieService {
         }
 
         return
-                categorieRepository
+                categoryRepository
                         .findByCode(code)
                         .map(CategirieDto::toDto)
                         .orElseThrow(

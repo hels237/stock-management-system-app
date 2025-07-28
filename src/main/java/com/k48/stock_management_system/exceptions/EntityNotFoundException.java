@@ -1,5 +1,7 @@
 package com.k48.stock_management_system.exceptions;
 
+import ch.qos.logback.core.spi.ErrorCodes;
+
 public class EntityNotFoundException extends RuntimeException {
 
     private ErrorCode errorCode;
@@ -21,5 +23,8 @@ public class EntityNotFoundException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
+    public ErrorCode getErrorCode() {
+        return errorCode;
+    }
 
 }

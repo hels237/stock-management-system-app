@@ -30,7 +30,7 @@ public class Article extends AbstractEntity{
     private String Photo;
 
     @ManyToOne
-    @JoinColumn(name = "categorieId")
+    @JoinColumn(name = "categoryId")
     private Categorie categorie;
 
     @ManyToOne
@@ -45,6 +45,9 @@ public class Article extends AbstractEntity{
 
     @OneToMany(mappedBy ="article")
     private List<MvtStock> mvtStock;
+
+    @OneToMany(mappedBy = "article")
+    private List<LigneVente> ligneVentes;
 
 
 }

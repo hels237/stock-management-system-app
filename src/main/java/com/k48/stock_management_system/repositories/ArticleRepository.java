@@ -12,6 +12,7 @@ import java.util.Optional;
 @Repository
 public interface ArticleRepository extends JpaRepository<Article,Integer> {
     Optional<Article> findByCodeArticle(String codeArticle);
+    List<Article> findAllByCategoryId(Integer idCategory);
     List<Article> findByDesignation(String designation);
 
 
