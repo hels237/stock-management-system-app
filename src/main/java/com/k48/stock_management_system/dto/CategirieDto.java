@@ -1,7 +1,6 @@
 package com.k48.stock_management_system.dto;
 
-import com.k48.stock_management_system.model.Categorie;
-import jakarta.validation.constraints.NotBlank;
+import com.k48.stock_management_system.model.Category;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,12 +28,12 @@ public class CategirieDto {
 
 
 
-    public static Categorie toEntity(CategirieDto categirieDto) {
+    public static Category toEntity(CategirieDto categirieDto) {
 
         if(categirieDto== null){
             return null;
         }
-        return Categorie
+        return Category
                 .builder()
                 .code(categirieDto.getCode())
                 .description(categirieDto.getDescription())
@@ -44,18 +43,18 @@ public class CategirieDto {
                 .build();
     }
 
-    public static CategirieDto toDto(Categorie categorie) {
+    public static CategirieDto toDto(Category category) {
 
-        if(categorie == null){
+        if(category == null){
             return null;
         }
         return CategirieDto.
                 builder()
-                .code(categorie.getCode())
-                .description(categorie.getDescription())
-                .designation(categorie.getDesignation())
-                .entrepriseId(categorie.getIdEntreprise())
-                .articleDtos(categorie.getArticles().stream().map(ArticleDto::toDto).toList())
+                .code(category.getCode())
+                .description(category.getDescription())
+                .designation(category.getDesignation())
+                .entrepriseId(category.getIdEntreprise())
+                .articleDtos(category.getArticles().stream().map(ArticleDto::toDto).toList())
                 .build();
 
     }

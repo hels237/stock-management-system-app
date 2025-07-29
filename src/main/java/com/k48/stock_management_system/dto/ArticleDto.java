@@ -59,7 +59,7 @@ public class ArticleDto {
                 .prixUnitaireHT(articleDto.getPrixUnitaireHT())
                 .tauxTva(articleDto.getTauxTva())
                 .prixUnitaireTTc(articleDto.getPrixUnitaireTTc())
-                .categorie(CategirieDto.toEntity(articleDto.getCategirieDto()))
+                .category(CategirieDto.toEntity(articleDto.getCategirieDto()))
                 .idEntreprise(articleDto.getEntrepriseId())
                 .build();
     }
@@ -77,7 +77,7 @@ public class ArticleDto {
                 .prixUnitaireHT(article.getPrixUnitaireHT())
                 .prixUnitaireTTc(article.getPrixUnitaireTTc())
                 .tauxTva(article.getTauxTva())
-                .categirieDto(CategirieDto.toDto(article.getCategorie()))
+                .categirieDto(CategirieDto.toDto(article.getCategory()))
                 .entrepriseId(article.getIdEntreprise())
                 .build();
     }

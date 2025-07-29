@@ -1,8 +1,6 @@
 package com.k48.stock_management_system.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -26,4 +24,10 @@ public class MvtStock extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "articleId")
     private Article article;;
+
+    @Enumerated(EnumType.STRING)
+    private TypeMvtStock typeMvt;
+
+    @Enumerated(EnumType.STRING)
+    private SourceMvtStock sourceMvt;
 }

@@ -4,7 +4,7 @@ package com.k48.stock_management_system.services.impl;
 import com.k48.stock_management_system.dto.CategirieDto;
 import com.k48.stock_management_system.exceptions.EntityNotFoundException;
 import com.k48.stock_management_system.exceptions.ErrorCode;
-import com.k48.stock_management_system.model.Categorie;
+import com.k48.stock_management_system.model.Category;
 import com.k48.stock_management_system.repositories.CategoryRepository;
 import com.k48.stock_management_system.services.CategorieService;
 import com.k48.stock_management_system.validator.ObjectValidator;
@@ -50,7 +50,7 @@ public class CategorieServiceImpl implements CategorieService {
     @Override
     public List<CategirieDto> findAll() {
 
-        List<Categorie> categories = categoryRepository.findAll();
+        List<Category> categories = categoryRepository.findAll();
 
         return
                 Optional.of(categories)
@@ -69,9 +69,9 @@ public class CategorieServiceImpl implements CategorieService {
         if(id == null) {
             log.error("0==) id: "+id +"is null");
         }
-        Categorie categorie = categoryRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("category with ID " + id + " not found"));
-        categoryRepository.delete(categorie);
-        return CategirieDto.toDto(categorie);
+        Category category = categoryRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("category with ID " + id + " not found"));
+        categoryRepository.delete(category);
+        return CategirieDto.toDto(category);
     }
 
     @Override

@@ -1,9 +1,6 @@
 package com.k48.stock_management_system.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -24,6 +21,9 @@ public class CmdeClient extends AbstractEntity {
     private Instant dateCmde;
 
     private Integer idEntreprise;
+
+    @Enumerated(EnumType.STRING)
+    private EtatCmde etatCommande;
 
     @ManyToOne
     @JoinColumn(name = "clientId")

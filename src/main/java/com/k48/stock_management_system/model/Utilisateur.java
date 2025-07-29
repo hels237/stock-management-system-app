@@ -1,12 +1,13 @@
 package com.k48.stock_management_system.model;
 
 
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.time.Instant;
+import java.util.List;
 
 
 @SuperBuilder
@@ -27,10 +28,16 @@ public class Utilisateur extends AbstractEntity {
 
     private String motDePasse;
 
+    private Instant dateDeNaissance;
+
     @Embedded
     private Adresse adresse;
 
     @ManyToOne
     @JoinColumn(name = "entrepriseId")
     private Entreprise entreprise;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "utilisateur")
+    @JsonIgnore
+    private List<Roles> roles;
 }

@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Categorie extends AbstractEntity{
+public class Category extends AbstractEntity{
 
     private String code;
 
