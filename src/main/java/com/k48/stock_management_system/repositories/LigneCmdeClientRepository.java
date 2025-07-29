@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LigneCmdeClientRepository extends JpaRepository<LigneCmdeClient,Integer> {
-    Optional<LigneCmdeClient> findLigneCmdeClientByArticleId(Integer articleId);
     List<LigneCmdeClient> findAllByCmdeClientId(Integer id);
+    List<LigneCmdeClient> findAllByCmdeClientCode(String code);
 
     List<LigneCmdeClient> findAllByArticleId(Integer id);
 }

@@ -10,7 +10,5 @@ public interface CmdeClientRepository extends JpaRepository<CmdeClient,Integer> 
 
     Optional<CmdeClient> findByCode(String codeCmdeClient);
 
-    Optional<CmdeClient> findCmdeClientByCode(String code);
-
     List<CmdeClient> findAllByClientId(Integer id);
 }

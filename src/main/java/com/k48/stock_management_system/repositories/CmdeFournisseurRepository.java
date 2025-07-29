@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface CmdeFournisseurRepository extends JpaRepository<CmdeFournisseur,Integer> {
     Optional<CmdeFournisseur> findByCode(String code);
     List<CmdeFournisseur> findByFournisseurId(Integer id);
-    List<CmdeClient> findAllByFournisseurId(Integer id);
+    List<CmdeFournisseur> findAllByFournisseurId(Integer id);
 }

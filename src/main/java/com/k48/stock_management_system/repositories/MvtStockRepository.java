@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface MvtStockRepository extends JpaRepository<MvtStock,Integer> {
-    @Query("select sum(m.quantite) from MvtStock k  where k.article.id = :idArticle")
+    @Query("select sum(m.quantite) from MvtStock m  where m.article.id = :idArticle")
     BigDecimal stockReelArticle(@Param("idArticle") Integer idArticle);
 
     List<MvtStock> findAllByArticleId(Integer idArticle);
