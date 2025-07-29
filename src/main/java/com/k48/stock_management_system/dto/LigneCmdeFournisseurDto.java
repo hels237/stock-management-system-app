@@ -37,7 +37,7 @@ public class LigneCmdeFournisseurDto {
                 .builder()
                 .prixUnitaire(ligneCmdeFournisseur.getPrixUnitaire())
                 .quantite(ligneCmdeFournisseur.getQuantite())
-                .articleDto(ArticleDto.toDto(ligneCmdeFournisseur.getArticle()))
+                .articleDto(ArticleDto.fromEntity(ligneCmdeFournisseur.getArticle()))
                 .entrepriseId(ligneCmdeFournisseur.getIdEntreprise())
                 .build();
     }

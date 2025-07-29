@@ -28,33 +28,33 @@ public class CategoryDto {
 
 
 
+    public static CategoryDto fromEntity(Category category) {
+
+        if(category == null){
+            return null;
+        }
+        return CategoryDto
+                .builder()
+                .code(category.getCode())
+                .description(category.getDescription())
+                .designation(category.getDesignation())
+                .entrepriseId(category.getIdEntreprise())
+                .articleDtos(category.getArticles().stream().map(ArticleDto::fromEntity).toList())
+                .build();
+    }
+
     public static Category toEntity(CategoryDto categoryDto) {
 
         if(categoryDto == null){
             return null;
         }
-        return Category
-                .builder()
+        return Category.
+                builder()
                 .code(categoryDto.getCode())
                 .description(categoryDto.getDescription())
                 .designation(categoryDto.getDesignation())
                 .idEntreprise(categoryDto.getEntrepriseId())
-                .articles(categoryDto.articleDtos.stream().map(ArticleDto::toEntity).toList())
-                .build();
-    }
-
-    public static CategoryDto toDto(Category category) {
-
-        if(category == null){
-            return null;
-        }
-        return CategoryDto.
-                builder()
-                .code(category.getCode())
-                .description(category.getDescription())
-                .designation(category.getDesignation())
-                .entrepriseId(category.getIdEntreprise())
-                .articleDtos(category.getArticles().stream().map(ArticleDto::toDto).toList())
+                .articles(categoryDto.getArticleDtos().stream().map(ArticleDto::toEntity).toList())
                 .build();
 
     }

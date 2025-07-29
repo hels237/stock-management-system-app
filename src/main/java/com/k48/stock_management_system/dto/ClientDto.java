@@ -32,34 +32,34 @@ public class ClientDto {
     private List<CmdeClientDto> cmdeClientDtos;
 
 
-    public static Client toEntity(ClientDto clientDto) {
-
-        if(clientDto== null){
-            return null;
-        }
-        return Client
-                .builder()
-                .adresse(AdresseDto.toEntity(clientDto.adresseDto))
-                .nom(clientDto.getNom())
-                .prenom(clientDto.getPrenom())
-                .email(clientDto.getEmail())
-                .numTelephone(clientDto.getNumTelephone())
-                .idEntreprise(clientDto.getEntrepriseId())
-                .build();
-    }
-
-    public static ClientDto toDto(Client client) {
+    public static ClientDto fromEntity(Client client) {
 
         if(client == null){
             return null;
         }
-        return ClientDto.builder()
+        return ClientDto
+                .builder()
+                .adresseDto(AdresseDto.fromEntity(client.getAdresse()))
                 .nom(client.getNom())
                 .prenom(client.getPrenom())
                 .email(client.getEmail())
-                .adresseDto(AdresseDto.toDto(client.getAdresse()))
                 .numTelephone(client.getNumTelephone())
                 .entrepriseId(client.getIdEntreprise())
+                .build();
+    }
+
+    public static Client toEntity(ClientDto clientDto) {
+
+        if(clientDto == null){
+            return null;
+        }
+        return Client.builder()
+                .nom(clientDto.getNom())
+                .prenom(clientDto.getPrenom())
+                .email(clientDto.getEmail())
+                .adresse(AdresseDto.toEntity(clientDto.getAdresseDto()))
+                .numTelephone(clientDto.getNumTelephone())
+                .idEntreprise(clientDto.getEntrepriseId())
                 .build();
     }
 }

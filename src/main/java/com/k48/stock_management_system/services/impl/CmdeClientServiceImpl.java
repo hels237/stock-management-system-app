@@ -1,20 +1,26 @@
 package com.k48.stock_management_system.services.impl;
 
+import com.k48.stock_management_system.dto.ArticleDto;
 import com.k48.stock_management_system.dto.CmdeClientDto;
 import com.k48.stock_management_system.dto.LigneCmdeClientDto;
+import com.k48.stock_management_system.dto.MvtStockDto;
 import com.k48.stock_management_system.exceptions.EntityNotFoundException;
+import com.k48.stock_management_system.exceptions.ErrorCode;
 import com.k48.stock_management_system.model.*;
 import com.k48.stock_management_system.repositories.ArticleRepository;
 import com.k48.stock_management_system.repositories.ClientRepository;
 import com.k48.stock_management_system.repositories.CmdeClientRepository;
 import com.k48.stock_management_system.repositories.LigneCmdeClientRepository;
 import com.k48.stock_management_system.services.CmdeClientService;
+import com.k48.stock_management_system.services.MvtStockService;
 import com.k48.stock_management_system.validator.ObjectValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +34,7 @@ public class CmdeClientServiceImpl implements CmdeClientService {
     private final ClientRepository clientRepository;
     private final LigneCmdeClientRepository ligneCmdeClientRepository;
     private final ArticleRepository articleRepository;
+    private final MvtStockService mvtStockService;
     private final ObjectValidator<CmdeClientDto> objectValidator;
 
 
@@ -56,13 +63,18 @@ public class CmdeClientServiceImpl implements CmdeClientService {
                                     .orElseThrow(
                                             ()-> new EntityNotFoundException("article with ID {} "+ligCmdClt.getArticleDto().getId()+"not found in DB!")
                                     );
+
                 }else{
                     log.warn("No Article found in DB we can't finalize the save operation");
 
                 }
             });
+
         }
 
+
+        // Définir la date de la commande
+        cmdeClientDto.setDateCmde(Instant.now());
 
         // if everything is good save the cmdClient
         CmdeClient cmdeClient = cmdeClientRepository.save(CmdeClientDto.toEntity(cmdeClientDto));
@@ -80,7 +92,7 @@ public class CmdeClientServiceImpl implements CmdeClientService {
 
         
 
-        return CmdeClientDto.toDto(cmdeClient);
+        return CmdeClientDto.fromEntity(cmdeClient);
     }
 
     @Override
@@ -110,9 +122,14 @@ public class CmdeClientServiceImpl implements CmdeClientService {
 
     @Override
     public CmdeClientDto findById(Integer cmdCltId) {
+        if (cmdCltId == null) {
+            log.error("Commande client ID is NULL");
+            return null;
+        }
         return
                 cmdeClientRepository
-                        .findById(cmdCltId).map(CmdeClientDto::toDto)
+                        .findById(cmdCltId)
+                        .map(CmdeClientDto::fromEntity)
                         .orElseThrow(
                                 ()-> new EntityNotFoundException("cmdClt with ID {} "+cmdCltId+"not found ")
                         );
@@ -120,7 +137,15 @@ public class CmdeClientServiceImpl implements CmdeClientService {
 
     @Override
     public CmdeClientDto findByCode(String code) {
-        return null;
+        if (!StringUtils.hasLength(code)) {
+            log.error("Commande client CODE is NULL");
+            return null;
+        }
+        return cmdeClientRepository.findByCode(code)
+                .map(CmdeClientDto::fromEntity)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Aucune commande client n'a ete trouve avec le CODE " + code, ErrorCode.CMDE_CLIENT_NOT_FOUND
+                ));
     }
 
     @Override
@@ -132,7 +157,7 @@ public class CmdeClientServiceImpl implements CmdeClientService {
                         .orElseThrow(
                                 ()->new EntityNotFoundException("EMPTY LIST {} no CMD_CLIENT"))
                         .stream()
-                        .map(CmdeClientDto::toDto)
+                        .map(CmdeClientDto::fromEntity)
                         .toList();
     }
 
@@ -152,7 +177,18 @@ public class CmdeClientServiceImpl implements CmdeClientService {
         CmdeClient cmdeClient = cmdeClientRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("cmdClient not found with ID " + id));
         cmdeClientRepository.delete(cmdeClient);
 
-        return CmdeClientDto.toDto(cmdeClient);
+        return CmdeClientDto.fromEntity(cmdeClient);
+    }
+    private void effectuerSortie(LigneCmdeClient lig) {
+        MvtStockDto mvtStkDto = MvtStockDto.builder()
+                .articleDto(ArticleDto.fromEntity(lig.getArticle()))
+                .dateMvt(Instant.now())
+                .typeMvt(TypeMvtStock.SORTIE)
+                .sourceMvt(SourceMvtStock.COMMANDE_CLIENT)
+                .quantite(lig.getQuantite())
+                .entrepriseId(lig.getIdEntreprise())
+                .build();
+        mvtStockService.sortieStock(mvtStkDto);
     }
 
 

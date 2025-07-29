@@ -1,7 +1,8 @@
 package com.k48.stock_management_system.dto;
 
-import com.k48.stock_management_system.model.LigneCmdeFournisseur;
 import com.k48.stock_management_system.model.MvtStock;
+import com.k48.stock_management_system.model.SourceMvtStock;
+import com.k48.stock_management_system.model.TypeMvtStock;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,12 +18,16 @@ public class MvtStockDto {
 
     private BigDecimal quantite;
 
-    private ArticleDto articleDto;;
+    private ArticleDto articleDto;
+
+    private TypeMvtStock typeMvt;
+
+    private SourceMvtStock sourceMvt;
 
     private Integer entrepriseId;
 
 
-    public static MvtStockDto toDto(MvtStock mvtStock) {
+    public static MvtStockDto fromEntity(MvtStock mvtStock) {
 
         if(mvtStock == null) {
             return null;
@@ -30,8 +35,10 @@ public class MvtStockDto {
         return MvtStockDto
                 .builder()
                 .dateMvt(mvtStock.getDateMvt())
+                .typeMvt(mvtStock.getTypeMvt())
+                .sourceMvt(mvtStock.getSourceMvt())
                 .quantite(mvtStock.getQuantite())
-                .articleDto(ArticleDto.toDto(mvtStock.getArticle()))
+                .articleDto(ArticleDto.fromEntity(mvtStock.getArticle()))
                 .entrepriseId(mvtStock.getIdEntreprise())
                 .build();
     }
@@ -45,6 +52,8 @@ public class MvtStockDto {
                 .builder()
                 .quantite(mvtStockDto.getQuantite())
                 .dateMvt(Instant.now())
+                .typeMvt(mvtStockDto.getTypeMvt())
+                .sourceMvt(mvtStockDto.getSourceMvt())
                 .article(ArticleDto.toEntity(mvtStockDto.getArticleDto()))
                 .idEntreprise(mvtStockDto.getEntrepriseId())
                 .build();

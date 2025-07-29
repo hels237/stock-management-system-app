@@ -34,7 +34,7 @@ public class UtilisateurDto {
 
 
 
-    public static UtilisateurDto toDto(Utilisateur utilisateur) {
+    public static UtilisateurDto fromEntity(Utilisateur utilisateur) {
 
         if(utilisateur == null){
             return null;
@@ -44,8 +44,8 @@ public class UtilisateurDto {
                 .nom(utilisateur.getNom())
                 .email(utilisateur.getEmail())
                 .prenom(utilisateur.getPrenom())
-                .adresseDto(AdresseDto.toDto(utilisateur.getAdresse()))
-                .entrepriseId(utilisateur.getIdEntreprise())
+                .adresseDto(AdresseDto.fromEntity(utilisateur.getAdresse()))
+                .entrepriseId(utilisateur.getEntreprise().getId())
                 .entrepriseDto(EntrepriseDto.toDto(utilisateur.getEntreprise()))
                 .build();
     }
@@ -61,7 +61,6 @@ public class UtilisateurDto {
                 .prenom(utilisateurDto.getPrenom())
                 .email(utilisateurDto.getEmail())
                 .adresse(AdresseDto.toEntity(utilisateurDto.getAdresseDto()))
-                .idEntreprise(utilisateurDto.getEntrepriseId())
                 .entreprise(EntrepriseDto.toEntity(utilisateurDto.entrepriseDto))
                 .build();
     }

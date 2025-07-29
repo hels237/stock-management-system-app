@@ -33,11 +33,8 @@ public class ArticleDto {
 
     private Integer entrepriseId;
 
-    //private Integer categoryId;
-
     private CategoryDto categoryDto;
 
-    private EntrepriseDto entrepriseDto;
 
     private List<LigneCmdeClientDto> ligneCmdeClientDtos;
 
@@ -47,38 +44,38 @@ public class ArticleDto {
 
 
 
-    public static Article toEntity(ArticleDto articleDto) {
-
-        if(articleDto== null){
-            return null;
-        }
-        return Article
-                .builder()
-                .codeArticle(articleDto.getCodeArticle())
-                .designation(articleDto.getDesignation())
-                .prixUnitaireHT(articleDto.getPrixUnitaireHT())
-                .tauxTva(articleDto.getTauxTva())
-                .prixUnitaireTTc(articleDto.getPrixUnitaireTTc())
-                .category(CategoryDto.toEntity(articleDto.getCategoryDto()))
-                .idEntreprise(articleDto.getEntrepriseId())
-                .build();
-    }
-
-    public static ArticleDto toDto(Article  article) {
+    public static ArticleDto fromEntity(Article article) {
 
         if(article == null){
             return null;
         }
-
-        return ArticleDto.
-                builder()
+        return ArticleDto
+                .builder()
                 .codeArticle(article.getCodeArticle())
                 .designation(article.getDesignation())
                 .prixUnitaireHT(article.getPrixUnitaireHT())
-                .prixUnitaireTTc(article.getPrixUnitaireTTc())
                 .tauxTva(article.getTauxTva())
-                .categoryDto(CategoryDto.toDto(article.getCategory()))
+                .prixUnitaireTTc(article.getPrixUnitaireTTc())
                 .entrepriseId(article.getIdEntreprise())
+                .categoryDto(CategoryDto.fromEntity(article.getCategory()))
+                .build();
+    }
+
+    public static Article toEntity(ArticleDto  articleDto) {
+
+        if(articleDto == null){
+            return null;
+        }
+
+        return Article.
+                builder()
+                .codeArticle(articleDto.getCodeArticle())
+                .designation(articleDto.getDesignation())
+                .prixUnitaireHT(articleDto.getPrixUnitaireHT())
+                .prixUnitaireTTc(articleDto.getPrixUnitaireTTc())
+                .tauxTva(articleDto.getTauxTva())
+                .category(CategoryDto.toEntity(articleDto.categoryDto))
+                .idEntreprise(articleDto.getEntrepriseId())
                 .build();
     }
 

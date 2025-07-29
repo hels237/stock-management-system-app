@@ -1,5 +1,6 @@
 package com.k48.stock_management_system.services.impl;
 
+import com.k48.stock_management_system.dto.ChangerMotDePasseUtilisateurDto;
 import com.k48.stock_management_system.dto.UtilisateurDto;
 import com.k48.stock_management_system.exceptions.EntityNotFoundException;
 import com.k48.stock_management_system.exceptions.ErrorCode;
@@ -8,7 +9,6 @@ import com.k48.stock_management_system.repositories.UtilisateurRepository;
 import com.k48.stock_management_system.services.UtilisateurService;
 import com.k48.stock_management_system.validator.ObjectValidator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.integration.IntegrationProperties;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public class UtilissateurServiceImpl  implements UtilisateurService {
     public UtilisateurDto save(UtilisateurDto utilisateurDto) {
         objectValidator.validate(utilisateurDto);
 
-        return UtilisateurDto.toDto(utilisateurRepository.save(UtilisateurDto.toEntity(utilisateurDto)));
+        return UtilisateurDto.fromEntity(utilisateurRepository.save(UtilisateurDto.toEntity(utilisateurDto)));
     }
 
     @Override
@@ -38,7 +38,7 @@ public class UtilissateurServiceImpl  implements UtilisateurService {
         return
                 utilisateurRepository
                         .findById(id)
-                        .map(UtilisateurDto::toDto)
+                        .map(UtilisateurDto::fromEntity)
                         .orElseThrow(
                                 ()-> new EntityNotFoundException("Utilisateur id " + id + " not found!")
                         );
@@ -54,7 +54,7 @@ public class UtilissateurServiceImpl  implements UtilisateurService {
                     ()-> new EntityNotFoundException("{} EMPTY List"+ ErrorCode.EMPTY_LIST)
                 )
                 .stream()
-                .map(UtilisateurDto::toDto)
+                .map(UtilisateurDto::fromEntity)
                 .toList();
     }
 
@@ -71,6 +71,16 @@ public class UtilissateurServiceImpl  implements UtilisateurService {
                                 ()-> new EntityNotFoundException("Utilisateur id " + id + " not found!")
                         );
         utilisateurRepository.delete(utilisateur);
-        return UtilisateurDto.toDto(utilisateur);
+        return UtilisateurDto.fromEntity(utilisateur);
+    }
+
+    @Override
+    public UtilisateurDto findByEmail(String email) {
+        return null;
+    }
+
+    @Override
+    public UtilisateurDto changerMotDePasse(ChangerMotDePasseUtilisateurDto dto) {
+        return null;
     }
 }

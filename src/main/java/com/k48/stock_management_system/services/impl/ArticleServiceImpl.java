@@ -7,7 +7,11 @@ import com.k48.stock_management_system.dto.LigneCmdeFournisseurDto;
 import com.k48.stock_management_system.dto.LigneVenteDto;
 import com.k48.stock_management_system.exceptions.EntityNotFoundException;
 import com.k48.stock_management_system.exceptions.ErrorCode;
+import com.k48.stock_management_system.exceptions.InvalidOperationException;
 import com.k48.stock_management_system.model.Article;
+import com.k48.stock_management_system.model.LigneCmdeClient;
+import com.k48.stock_management_system.model.LigneCmdeFournisseur;
+import com.k48.stock_management_system.model.LigneVente;
 import com.k48.stock_management_system.repositories.ArticleRepository;
 import com.k48.stock_management_system.repositories.LigneCmdeClientRepository;
 import com.k48.stock_management_system.repositories.LigneCmdeFournisseurRepository;
@@ -43,7 +47,7 @@ public  class ArticleServiceImpl implements ArticleService {
         //validate the object
         objectValidator.validate(articleDto);
 
-        return ArticleDto.toDto(articleRepository.save(ArticleDto.toEntity(articleDto)));
+        return ArticleDto.fromEntity(articleRepository.save(ArticleDto.toEntity(articleDto)));
     }
 
     @Override
@@ -55,7 +59,7 @@ public  class ArticleServiceImpl implements ArticleService {
         return
                 articleRepository
                         .findById(id)
-                        .map(ArticleDto::toDto)
+                        .map(ArticleDto::fromEntity)
                         .orElseThrow(
                                 ()->  new EntityNotFoundException("Article with id " + id + " not found"    )
                         ) ;
@@ -72,7 +76,7 @@ public  class ArticleServiceImpl implements ArticleService {
         return
                 articleRepository
                         .findByCodeArticle(codeArticle)
-                        .map(ArticleDto::toDto)
+                        .map(ArticleDto::fromEntity)
                         .orElseThrow(
                                 ()-> new EntityNotFoundException("Article with code " + codeArticle + " not found",ErrorCode.ARTICLE_NOT_FOUND)
                         );
@@ -91,7 +95,7 @@ public  class ArticleServiceImpl implements ArticleService {
                                 ()-> new EntityNotFoundException(" EMPTY LIST ! "+ErrorCode.EMPTY_LIST)
                         )
                         .stream()
-                        .map(ArticleDto::toDto)
+                        .map(ArticleDto::fromEntity)
                         .toList();
     }
 
@@ -119,7 +123,7 @@ public  class ArticleServiceImpl implements ArticleService {
     @Override
     public List<ArticleDto> findAllArticleByCategoryId(Integer idCategory){
         return articleRepository.findAllByCategoryId(idCategory).stream()
-                .map(ArticleDto::toDto)
+                .map(ArticleDto::fromEntity)
                 .collect(Collectors.toList());
     }
 
@@ -137,9 +141,25 @@ public  class ArticleServiceImpl implements ArticleService {
                         .orElseThrow(
                                 ()-> new EntityNotFoundException("Article with id " + id + " not found"+ ErrorCode.ARTICLE_NOT_FOUND)
                         );
-        articleRepository.delete(article);
 
-        return ArticleDto.toDto(article);
+
+        List<LigneCmdeClient> ligneCommandeClients = commandeClientRepository.findAllByArticleId(id);
+        if (!ligneCommandeClients.isEmpty()) {
+            throw new InvalidOperationException("Impossible de supprimer un article deja utilise dans des commandes client", ErrorCode.ARTICLE_ALREADY_IN_USE);
+        }
+        List<LigneCmdeFournisseur> ligneCommandeFournisseurs = commandeFournisseurRepository.findAllByArticleId(id);
+        if (!ligneCommandeFournisseurs.isEmpty()) {
+            throw new InvalidOperationException("Impossible de supprimer un article deja utilise dans des commandes fournisseur",
+                    ErrorCode.ARTICLE_ALREADY_IN_USE);
+        }
+        List<LigneVente> ligneVentes = venteRepository.findAllByArticleId(id);
+        if (!ligneVentes.isEmpty()) {
+            throw new InvalidOperationException("Impossible de supprimer un article deja utilise dans des ventes",
+                    ErrorCode.ARTICLE_ALREADY_IN_USE);
+        }
+
+        articleRepository.delete(article);
+        return ArticleDto.fromEntity(article);
     }
 
 }

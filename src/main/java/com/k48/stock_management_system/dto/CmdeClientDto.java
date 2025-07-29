@@ -1,7 +1,6 @@
 package com.k48.stock_management_system.dto;
 
 
-import com.k48.stock_management_system.model.Client;
 import com.k48.stock_management_system.model.CmdeClient;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,30 +26,30 @@ public class CmdeClientDto {
     private List<LigneCmdeClientDto> ligneCmdeClientDtos;
 
 
+    public static CmdeClientDto fromEntity(CmdeClient cmdeClient) {
+
+        if (cmdeClient == null) {
+            return null;
+        }
+        return CmdeClientDto
+                .builder()
+                .clientDto(ClientDto.fromEntity(cmdeClient.getClient()))
+                .code(cmdeClient.getCode())
+                .dateCmde(cmdeClient.getDateCmde())
+                .entrepriseId(cmdeClient.getIdEntreprise())
+                .build();
+    }
+
     public static CmdeClient toEntity(CmdeClientDto cmdeClientDto) {
 
         if (cmdeClientDto == null) {
             return null;
         }
-        return CmdeClient
-                .builder()
+        return CmdeClient.builder()
                 .client(ClientDto.toEntity(cmdeClientDto.getClientDto()))
                 .code(cmdeClientDto.getCode())
                 .dateCmde(cmdeClientDto.getDateCmde())
                 .idEntreprise(cmdeClientDto.getEntrepriseId())
-                .build();
-    }
-
-    public static CmdeClientDto toDto(CmdeClient cmdeClient) {
-
-        if (cmdeClient == null) {
-            return null;
-        }
-        return CmdeClientDto.builder()
-                .clientDto(ClientDto.toDto(cmdeClient.getClient()))
-                .code(cmdeClient.getCode())
-                .dateCmde(cmdeClient.getDateCmde())
-                .entrepriseId(cmdeClient.getIdEntreprise())
                 .build();
     }
 

@@ -40,6 +40,11 @@ public class VenteServiceImpl implements VenteService {
     }
 
     @Override
+    public VenteDto findByCode(String code) {
+        return null;
+    }
+
+    @Override
     public List<VenteDto> findAll() {
 
         List<Vente> ventes = venteRepository.findAll();

@@ -5,7 +5,7 @@ import com.k48.stock_management_system.dto.MvtStockDto;
 import java.math.BigDecimal;
 import java.util.List;
 
-public interface MvtStockService extends AbstractService<MvtStockDto> {
+public interface MvtStockService {
     BigDecimal stockReelArticle(Integer idArticle);
 
     List<MvtStockDto> mvtStkArticle(Integer idArticle);
