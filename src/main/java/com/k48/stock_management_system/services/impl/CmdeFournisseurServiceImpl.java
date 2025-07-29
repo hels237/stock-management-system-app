@@ -3,10 +3,7 @@ package com.k48.stock_management_system.services.impl;
 import com.k48.stock_management_system.dto.CmdeFournisseurDto;
 import com.k48.stock_management_system.dto.LigneCmdeFournisseurDto;
 import com.k48.stock_management_system.exceptions.EntityNotFoundException;
-import com.k48.stock_management_system.model.Article;
-import com.k48.stock_management_system.model.CmdeFournisseur;
-import com.k48.stock_management_system.model.Fournisseur;
-import com.k48.stock_management_system.model.LigneCmdeFournisseur;
+import com.k48.stock_management_system.model.*;
 import com.k48.stock_management_system.repositories.ArticleRepository;
 import com.k48.stock_management_system.repositories.CmdeFournisseurRepository;
 import com.k48.stock_management_system.repositories.FournisseurRepository;
@@ -17,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,6 +75,31 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
     }
 
     @Override
+    public CmdeFournisseurDto updateEtatCommande(Integer idCommande, EtatCmde etatCommande) {
+        return null;
+    }
+
+    @Override
+    public CmdeFournisseurDto updateQuantiteCommande(Integer idCommande, Integer idLigneCommande, BigDecimal quantite) {
+        return null;
+    }
+
+    @Override
+    public CmdeFournisseurDto updateFournisseur(Integer idCommande, Integer idFournisseur) {
+        return null;
+    }
+
+    @Override
+    public CmdeFournisseurDto updateArticle(Integer idCommande, Integer idLigneCommande, Integer idArticle) {
+        return null;
+    }
+
+    @Override
+    public CmdeFournisseurDto deleteArticle(Integer idCommande, Integer idLigneCommande) {
+        return null;
+    }
+
+    @Override
     public CmdeFournisseurDto findById(Integer id) {
         if(id == null) {
             log.error("No ID was provided");
@@ -92,6 +115,11 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
     }
 
     @Override
+    public CmdeFournisseurDto findByCode(String code) {
+        return null;
+    }
+
+    @Override
     public List<CmdeFournisseurDto> findAll() {
 
         List<CmdeFournisseur> cmdeFournisseurs = cmdeFournisseurRepository.findAll();
@@ -103,6 +131,11 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
                         ).stream()
                         .map(CmdeFournisseurDto::toDto)
                         .toList();
+    }
+
+    @Override
+    public List<LigneCmdeFournisseurDto> findAllLignesCommandesFournisseurByCommandeFournisseurId(Integer idCommande) {
+        return List.of();
     }
 
     @Override

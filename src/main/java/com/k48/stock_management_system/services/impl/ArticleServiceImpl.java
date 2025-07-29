@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public abstract class ArticleServiceImpl implements ArticleService {
+public  class ArticleServiceImpl implements ArticleService {
 
     private final ArticleRepository articleRepository;
     private final LigneVenteRepository venteRepository;
@@ -97,7 +97,7 @@ public abstract class ArticleServiceImpl implements ArticleService {
 
     @Override
     public List<LigneVenteDto> findAllLigneVentes(Integer idArticle){
-        return venteRepository.findLigneVenteByArticleId(idArticle).stream()
+        return venteRepository.findAllByArticleId(idArticle).stream()
                 .map(LigneVenteDto::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -111,12 +111,16 @@ public abstract class ArticleServiceImpl implements ArticleService {
 
     @Override
     public List<LigneCmdeFournisseurDto> findAllLigneCmdeFournisseur(Integer idArticle){
-        return null;
+        return commandeFournisseurRepository.findAllByArticleId(idArticle).stream()
+                .map(LigneCmdeFournisseurDto::fromEntity)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<ArticleDto> findAllArticleByCategoryId(Integer idCategory){
-        return null;
+        return articleRepository.findAllByCategoryId(idCategory).stream()
+                .map(ArticleDto::toDto)
+                .collect(Collectors.toList());
     }
 
 

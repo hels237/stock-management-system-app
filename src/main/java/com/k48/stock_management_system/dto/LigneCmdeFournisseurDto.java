@@ -1,8 +1,6 @@
 package com.k48.stock_management_system.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.k48.stock_management_system.model.Article;
-import com.k48.stock_management_system.model.LigneCmdeClient;
 import com.k48.stock_management_system.model.LigneCmdeFournisseur;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,7 +28,7 @@ public class LigneCmdeFournisseurDto {
 
 
 
-    public static LigneCmdeFournisseurDto toDto(LigneCmdeFournisseur ligneCmdeFournisseur) {
+    public static LigneCmdeFournisseurDto fromEntity(LigneCmdeFournisseur ligneCmdeFournisseur) {
 
         if(ligneCmdeFournisseur == null) {
             return null;

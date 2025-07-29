@@ -10,7 +10,7 @@ import java.util.List;
 
 @Getter @Setter
 @Builder
-public class CategirieDto {
+public class CategoryDto {
 
     private Integer categorieId;
 
@@ -28,27 +28,27 @@ public class CategirieDto {
 
 
 
-    public static Category toEntity(CategirieDto categirieDto) {
+    public static Category toEntity(CategoryDto categoryDto) {
 
-        if(categirieDto== null){
+        if(categoryDto == null){
             return null;
         }
         return Category
                 .builder()
-                .code(categirieDto.getCode())
-                .description(categirieDto.getDescription())
-                .designation(categirieDto.getDesignation())
-                .idEntreprise(categirieDto.getEntrepriseId())
-                .articles(categirieDto.articleDtos.stream().map(ArticleDto::toEntity).toList())
+                .code(categoryDto.getCode())
+                .description(categoryDto.getDescription())
+                .designation(categoryDto.getDesignation())
+                .idEntreprise(categoryDto.getEntrepriseId())
+                .articles(categoryDto.articleDtos.stream().map(ArticleDto::toEntity).toList())
                 .build();
     }
 
-    public static CategirieDto toDto(Category category) {
+    public static CategoryDto toDto(Category category) {
 
         if(category == null){
             return null;
         }
-        return CategirieDto.
+        return CategoryDto.
                 builder()
                 .code(category.getCode())
                 .description(category.getDescription())

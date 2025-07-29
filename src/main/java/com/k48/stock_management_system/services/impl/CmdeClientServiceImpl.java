@@ -3,10 +3,7 @@ package com.k48.stock_management_system.services.impl;
 import com.k48.stock_management_system.dto.CmdeClientDto;
 import com.k48.stock_management_system.dto.LigneCmdeClientDto;
 import com.k48.stock_management_system.exceptions.EntityNotFoundException;
-import com.k48.stock_management_system.model.Article;
-import com.k48.stock_management_system.model.Client;
-import com.k48.stock_management_system.model.CmdeClient;
-import com.k48.stock_management_system.model.LigneCmdeClient;
+import com.k48.stock_management_system.model.*;
 import com.k48.stock_management_system.repositories.ArticleRepository;
 import com.k48.stock_management_system.repositories.ClientRepository;
 import com.k48.stock_management_system.repositories.CmdeClientRepository;
@@ -17,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -86,6 +84,31 @@ public class CmdeClientServiceImpl implements CmdeClientService {
     }
 
     @Override
+    public CmdeClientDto updateEtatCommande(Integer idCommande, EtatCmde etatCommande) {
+        return null;
+    }
+
+    @Override
+    public CmdeClientDto updateQuantiteCommande(Integer idCommande, Integer idLigneCommande, BigDecimal quantite) {
+        return null;
+    }
+
+    @Override
+    public CmdeClientDto updateClient(Integer idCommande, Integer idClient) {
+        return null;
+    }
+
+    @Override
+    public CmdeClientDto updateArticle(Integer idCommande, Integer idLigneCommande, Integer newIdArticle) {
+        return null;
+    }
+
+    @Override
+    public CmdeClientDto deleteArticle(Integer idCommande, Integer idLigneCommande) {
+        return null;
+    }
+
+    @Override
     public CmdeClientDto findById(Integer cmdCltId) {
         return
                 cmdeClientRepository
@@ -93,6 +116,11 @@ public class CmdeClientServiceImpl implements CmdeClientService {
                         .orElseThrow(
                                 ()-> new EntityNotFoundException("cmdClt with ID {} "+cmdCltId+"not found ")
                         );
+    }
+
+    @Override
+    public CmdeClientDto findByCode(String code) {
+        return null;
     }
 
     @Override
@@ -106,6 +134,11 @@ public class CmdeClientServiceImpl implements CmdeClientService {
                         .stream()
                         .map(CmdeClientDto::toDto)
                         .toList();
+    }
+
+    @Override
+    public List<LigneCmdeClientDto> findAllLignesCommandesClientByCommandeClientId(Integer idCommande) {
+        return List.of();
     }
 
     @Override

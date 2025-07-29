@@ -1,12 +1,12 @@
 package com.k48.stock_management_system.services.impl;
 
 
-import com.k48.stock_management_system.dto.CategirieDto;
+import com.k48.stock_management_system.dto.CategoryDto;
 import com.k48.stock_management_system.exceptions.EntityNotFoundException;
 import com.k48.stock_management_system.exceptions.ErrorCode;
 import com.k48.stock_management_system.model.Category;
 import com.k48.stock_management_system.repositories.CategoryRepository;
-import com.k48.stock_management_system.services.CategorieService;
+import com.k48.stock_management_system.services.CategoryService;
 import com.k48.stock_management_system.validator.ObjectValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,21 +18,21 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class CategorieServiceImpl implements CategorieService {
+public class CategoryServiceImpl implements CategoryService {
 
-    private final ObjectValidator<CategirieDto> objectValidator;
+    private final ObjectValidator<CategoryDto> objectValidator;
     private final CategoryRepository categoryRepository;
 
 
     @Override
-    public CategirieDto save(CategirieDto categirieDto) {
+    public CategoryDto save(CategoryDto categoryDto) {
 
-        objectValidator.validate(categirieDto);
-        return CategirieDto.toDto(categoryRepository.save(CategirieDto.toEntity(categirieDto)));
+        objectValidator.validate(categoryDto);
+        return CategoryDto.toDto(categoryRepository.save(CategoryDto.toEntity(categoryDto)));
     }
 
     @Override
-    public CategirieDto findById(Integer id) {
+    public CategoryDto findById(Integer id) {
         if(id == null) {
             log.error("id is null");
         }
@@ -40,7 +40,7 @@ public class CategorieServiceImpl implements CategorieService {
         return
                 categoryRepository
                         .findById(id)
-                        .map(CategirieDto::toDto)
+                        .map(CategoryDto::toDto)
                         .orElseThrow(
                                 ()-> new EntityNotFoundException("category with ID " + id + " not found"+ ErrorCode.CATEGORIE_NOT_FOUND)
                         );
@@ -48,7 +48,7 @@ public class CategorieServiceImpl implements CategorieService {
 
 
     @Override
-    public List<CategirieDto> findAll() {
+    public List<CategoryDto> findAll() {
 
         List<Category> categories = categoryRepository.findAll();
 
@@ -59,23 +59,23 @@ public class CategorieServiceImpl implements CategorieService {
                                 ()-> new EntityNotFoundException(" EMPTY LIST OF CATEGORIES "+ ErrorCode.CATEGORIE_NOT_FOUND)
                         )
                         .stream()
-                        .map(CategirieDto::toDto)
+                        .map(CategoryDto::toDto)
                         .toList();
     }
 
     @Override
-    public CategirieDto delete(Integer id) {
+    public CategoryDto delete(Integer id) {
 
         if(id == null) {
             log.error("0==) id: "+id +"is null");
         }
         Category category = categoryRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("category with ID " + id + " not found"));
         categoryRepository.delete(category);
-        return CategirieDto.toDto(category);
+        return CategoryDto.toDto(category);
     }
 
     @Override
-    public CategirieDto findByCode(String code) {
+    public CategoryDto findByCode(String code) {
         if(code == null) {
             log.error("code is null !");
         }
@@ -83,7 +83,7 @@ public class CategorieServiceImpl implements CategorieService {
         return
                 categoryRepository
                         .findByCode(code)
-                        .map(CategirieDto::toDto)
+                        .map(CategoryDto::toDto)
                         .orElseThrow(
                                 ()-> new EntityNotFoundException("category with id "+code+" not found")
                         );
