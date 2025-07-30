@@ -2,6 +2,7 @@ package com.k48.stock_management_system.dto;
 
 
 import com.k48.stock_management_system.model.CmdeClient;
+import com.k48.stock_management_system.model.EtatCmde;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,6 +21,8 @@ public class CmdeClientDto {
     private Instant dateCmde;
 
     private ClientDto clientDto;
+
+    private EtatCmde etatCommande;
 
     private Integer entrepriseId;
 
@@ -51,6 +54,10 @@ public class CmdeClientDto {
                 .dateCmde(cmdeClientDto.getDateCmde())
                 .idEntreprise(cmdeClientDto.getEntrepriseId())
                 .build();
+    }
+
+    public boolean isCommandeLivree() {
+        return EtatCmde.LIVREE.equals(this.etatCommande);
     }
 
 }
