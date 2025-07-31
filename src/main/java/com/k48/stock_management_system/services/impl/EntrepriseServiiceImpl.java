@@ -5,19 +5,22 @@ import com.k48.stock_management_system.exceptions.EntityNotFoundException;
 import com.k48.stock_management_system.model.Entreprise;
 import com.k48.stock_management_system.repositories.EntrepriseRepository;
 import com.k48.stock_management_system.services.EntrepriseService;
+import com.k48.stock_management_system.services.UtilisateurService;
 import com.k48.stock_management_system.validator.ObjectValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EntrepriseServiiceImpl implements EntrepriseService {
 
     private final EntrepriseRepository  entrepriseRepository;
+    private final UtilisateurService utilisateurService;
     private final ObjectValidator<EntrepriseDto> objectValidator;
 
 
@@ -58,6 +61,7 @@ public class EntrepriseServiiceImpl implements EntrepriseService {
     @Override
     public EntrepriseDto delete(Integer id) {
         if (id == null) {
+            log.error("Entreprise ID is null");
             return null;
         }
         Entreprise entreprise =
