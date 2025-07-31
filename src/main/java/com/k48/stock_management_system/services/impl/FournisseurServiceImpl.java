@@ -3,9 +3,13 @@ package com.k48.stock_management_system.services.impl;
 
 import com.k48.stock_management_system.dto.FournisseurDto;
 import com.k48.stock_management_system.exceptions.EntityNotFoundException;
+import com.k48.stock_management_system.exceptions.InvalidOperationException;
 import com.k48.stock_management_system.model.Fournisseur;
+import com.k48.stock_management_system.repositories.ArticleRepository;
 import com.k48.stock_management_system.repositories.FournisseurRepository;
+import com.k48.stock_management_system.repositories.LigneCmdeFournisseurRepository;
 import com.k48.stock_management_system.services.FournisseurService;
+import com.k48.stock_management_system.services.MvtStockService;
 import com.k48.stock_management_system.validator.ObjectValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,13 +23,16 @@ public class FournisseurServiceImpl implements FournisseurService {
 
     private final FournisseurRepository fournisseurRepository;
     private final ObjectValidator<FournisseurDto> objectValidator;
+    private final LigneCmdeFournisseurRepository ligneCommandeFournisseurRepository;
+    private final ArticleRepository articleRepository;
+    private final MvtStockService mvtStkService;
 
     @Override
     public FournisseurDto save(FournisseurDto fournisseurDto) {
 
         objectValidator.validate(fournisseurDto);
 
-        return FournisseurDto.toDto(fournisseurRepository.save(FournisseurDto.toEntity(fournisseurDto)));
+        return FournisseurDto.fromEntity(fournisseurRepository.save(FournisseurDto.toEntity(fournisseurDto)));
     }
 
     @Override
@@ -36,7 +43,7 @@ public class FournisseurServiceImpl implements FournisseurService {
         return
                 fournisseurRepository
                         .findById(id)
-                        .map(FournisseurDto::toDto)
+                        .map(FournisseurDto::fromEntity)
                         .orElseThrow(
                                 ()-> new EntityNotFoundException("Fournisseur with id " + id + " not found")
                         );
@@ -53,7 +60,7 @@ public class FournisseurServiceImpl implements FournisseurService {
                         ()-> new EntityNotFoundException("EMPTY LIST ")
                 )
                 .stream()
-                .map(FournisseurDto::toDto)
+                .map(FournisseurDto::fromEntity)
                 .toList();
     }
 
@@ -66,6 +73,6 @@ public class FournisseurServiceImpl implements FournisseurService {
         Fournisseur fournisseur = fournisseurRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Fournisseur with id " + id + " not found"));
         fournisseurRepository.delete(fournisseur);
 
-        return FournisseurDto.toDto(fournisseur);
+        return FournisseurDto.fromEntity(fournisseur);
     }
 }

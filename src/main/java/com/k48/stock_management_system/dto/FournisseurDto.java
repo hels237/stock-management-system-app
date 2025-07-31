@@ -1,6 +1,5 @@
 package com.k48.stock_management_system.dto;
 
-import com.k48.stock_management_system.model.Entreprise;
 import com.k48.stock_management_system.model.Fournisseur;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,7 +28,7 @@ public class FournisseurDto {
     private Integer entrepriseId;
 
 
-    public static FournisseurDto toDto(Fournisseur fournisseur) {
+    public static FournisseurDto fromEntity(Fournisseur fournisseur) {
 
         if(fournisseur == null){
             return null;
@@ -40,6 +39,7 @@ public class FournisseurDto {
                 .email(fournisseur.getEmail())
                 .prenom(fournisseur.getPrenom())
                 .entrepriseId(fournisseur.getIdEntreprise())
+                .numTelephone(fournisseur.getNumTelephone())
                 .build();
     }
 
@@ -55,6 +55,9 @@ public class FournisseurDto {
                 .prenom(fournisseurDto.getPrenom())
                 .email(fournisseurDto.getEmail())
                 .idEntreprise(fournisseurDto.getEntrepriseId())
+                .numTelephone(fournisseurDto.getNumTelephone())
                 .build();
     }
+
+
 }
