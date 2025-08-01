@@ -12,13 +12,15 @@ import java.math.BigDecimal;
 @Getter @Setter
 public class LigneVenteDto {
 
+    private Integer id;
+
     private BigDecimal prixUnitaire;
 
     private BigDecimal quantite;
 
-    private Vente vente;
+    private VenteDto venteDto;
 
-    private Article article;
+    private ArticleDto articleDto;
 
     private Integer entrepriseId;
 
@@ -29,6 +31,9 @@ public class LigneVenteDto {
         }
         return LigneVenteDto
                 .builder()
+                .id(ligneVente.getId())
+                .articleDto(ArticleDto.fromEntity(ligneVente.getArticle()))
+                .venteDto(VenteDto.fromEntity(ligneVente.getVente()))
                 .prixUnitaire(ligneVente.getPrixUnitaire())
                 .quantite(ligneVente.getQuantite())
                 .entrepriseId(ligneVente.getIdEntreprise())
@@ -42,6 +47,8 @@ public class LigneVenteDto {
         }
         return LigneVente
                 .builder()
+                .article(ArticleDto.toEntity(ligneVenteDto.getArticleDto()))
+                .vente(VenteDto.toEntity(ligneVenteDto.getVenteDto()))
                 .prixUnitaire(ligneVenteDto.getPrixUnitaire())
                 .quantite(ligneVenteDto.getQuantite())
                 .idEntreprise(ligneVenteDto.getEntrepriseId())

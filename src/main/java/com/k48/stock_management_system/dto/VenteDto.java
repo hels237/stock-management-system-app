@@ -1,9 +1,7 @@
 package com.k48.stock_management_system.dto;
 
 
-import com.k48.stock_management_system.model.LigneVente;
 import com.k48.stock_management_system.model.Vente;
-import jakarta.persistence.OneToMany;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +14,7 @@ import java.util.List;
 @Builder
 public class VenteDto {
 
+    private Integer id;
 
     private String code;
 
@@ -23,12 +22,12 @@ public class VenteDto {
 
     private Instant dateVente;
 
-    private List<LigneVente> ligneVentes;
+    private List<LigneVenteDto> ligneVentes;
 
     private Integer entrepriseId;
 
 
-    public static VenteDto toDto(Vente vente) {
+    public static VenteDto fromEntity(Vente vente) {
         if(vente == null) {
             return null;
         }

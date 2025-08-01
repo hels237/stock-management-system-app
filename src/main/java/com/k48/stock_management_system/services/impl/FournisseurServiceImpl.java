@@ -12,11 +12,12 @@ import com.k48.stock_management_system.services.FournisseurService;
 import com.k48.stock_management_system.services.MvtStockService;
 import com.k48.stock_management_system.validator.ObjectValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FournisseurServiceImpl implements FournisseurService {
@@ -38,6 +39,7 @@ public class FournisseurServiceImpl implements FournisseurService {
     @Override
     public FournisseurDto findById(Integer id) {
         if(id == null) {
+            log.error("Fournisseur ID is null");
             return null;
         }
         return
