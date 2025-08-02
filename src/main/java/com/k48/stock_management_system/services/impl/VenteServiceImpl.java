@@ -1,19 +1,22 @@
 package com.k48.stock_management_system.services.impl;
 
+import com.k48.stock_management_system.dto.ArticleDto;
 import com.k48.stock_management_system.dto.LigneVenteDto;
+import com.k48.stock_management_system.dto.MvtStockDto;
 import com.k48.stock_management_system.dto.VenteDto;
 import com.k48.stock_management_system.exceptions.EntityNotFoundException;
-import com.k48.stock_management_system.model.Article;
-import com.k48.stock_management_system.model.LigneVente;
-import com.k48.stock_management_system.model.Vente;
+import com.k48.stock_management_system.model.*;
 import com.k48.stock_management_system.repositories.ArticleRepository;
+import com.k48.stock_management_system.repositories.LigneVenteRepository;
 import com.k48.stock_management_system.repositories.VenteRepository;
+import com.k48.stock_management_system.services.MvtStockService;
 import com.k48.stock_management_system.services.VenteService;
 import com.k48.stock_management_system.validator.ObjectValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,7 +27,9 @@ public class VenteServiceImpl implements VenteService {
 
     private final VenteRepository venteRepository;
     private final ObjectValidator<VenteDto> objectValidator;
+    private final LigneVenteRepository ligneVenteRepository;
     private final ArticleRepository articleRepository;
+    private final MvtStockService mvtStockService;
 
     @Override
     public VenteDto save(VenteDto venteDto) {
@@ -32,9 +37,9 @@ public class VenteServiceImpl implements VenteService {
         objectValidator.validate(venteDto);
 
         venteDto.getLigneVentes().forEach(ligneVenteDto -> {
-            Optional<Article> article = articleRepository.findById(ligneVenteDto.getArticle().getId());
+            Optional<Article> article = articleRepository.findById(ligneVenteDto.getArticleDto().getId());
             if (article.isEmpty()) {
-                log.error("Aucun article avec l'ID " + ligneVenteDto.getArticle().getId() + " n'a ete trouve dans la BD");
+                log.error("Aucun article avec l'ID " + ligneVenteDto.getArticleDto().getId() + " n'a ete trouve dans la BD");
             }
         });
 
@@ -97,5 +102,17 @@ public class VenteServiceImpl implements VenteService {
                         );
         venteRepository.delete(vente);
         return VenteDto.fromEntity(vente);
+    }
+
+    private void updateMvtStk(LigneVente lig) {
+        MvtStockDto mvtStkDto = MvtStockDto.builder()
+                .articleDto(ArticleDto.fromEntity(lig.getArticle()))
+                .dateMvt(Instant.now())
+                .typeMvt(TypeMvtStock.SORTIE)
+                .sourceMvt(SourceMvtStock.VENTE)
+                .quantite(lig.getQuantite())
+                .entrepriseId(lig.getIdEntreprise())
+                .build();
+        mvtStockService.sortieStock(mvtStkDto);
     }
 }
