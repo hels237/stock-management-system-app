@@ -1,12 +1,18 @@
 package com.k48.stock_management_system.controller;
 
 
+import com.k48.stock_management_system.controller.api.ArticleApi;
 import com.k48.stock_management_system.dto.ArticleDto;
+import com.k48.stock_management_system.dto.LigneCmdeClientDto;
+import com.k48.stock_management_system.dto.LigneCmdeFournisseurDto;
+import com.k48.stock_management_system.dto.LigneVenteDto;
 import com.k48.stock_management_system.services.ArticleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.k48.stock_management_system.utils.Constants.APP_ROOT;
 
@@ -15,31 +21,53 @@ import static com.k48.stock_management_system.utils.Constants.APP_ROOT;
 @RestController
 @RequestMapping(APP_ROOT+"/article")
 @RequiredArgsConstructor
-public class ArticleController {
+public class ArticleController implements ArticleApi {
 
     private  ArticleService articleService;
 
-
-
-    @PostMapping(value = "/create",consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
-    public  ResponseEntity<?> saveArticle(@RequestBody ArticleDto  articleDto){
-        return ResponseEntity.ok(articleService.save(articleDto));
+    @Override
+    public ArticleDto save(ArticleDto dto) {
+        return  articleService.save(dto);
     }
 
-    @GetMapping(value = "/findbycode/{codeArticle}",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> findByCodeArticle(@PathVariable String codeArticle){
-        return ResponseEntity.ok(articleService.findByCodeArticle(codeArticle));
+    @Override
+    public ArticleDto findById(Integer id) {
+        return articleService.findById(id);
     }
 
-    @GetMapping("/findall")
-    public ResponseEntity<?> findAll(){
-        return ResponseEntity.ok(articleService.findAll());
+    @Override
+    public ArticleDto findByCodeArticle(String codeArticle) {
+        return articleService.findByCodeArticle(codeArticle);
     }
 
+    @Override
+    public List<ArticleDto> findAll() {
+        return articleService.findAll();
+    }
 
-    @DeleteMapping(value = "/delete/{articleId}")
-    public ResponseEntity<?> deleteArticleById(@PathVariable Integer articleId){
-        return ResponseEntity.ok(articleService.delete(articleId));
+    @Override
+    public List<LigneVenteDto> findHistoriqueVentes(Integer idArticle) {
+        return articleService.findAllLigneVentes(idArticle);
+    }
+
+    @Override
+    public List<LigneCmdeClientDto> findHistoriqueCommandeClient(Integer idArticle) {
+        return articleService.findAllLigneCmdeClient(idArticle);
+    }
+
+    @Override
+    public List<LigneCmdeFournisseurDto> findHistoriqueCommandeFournisseur(Integer idArticle) {
+        return articleService.findAllLigneCmdeFournisseur(idArticle);
+    }
+
+    @Override
+    public List<ArticleDto> findAllArticleByIdCategory(Integer idCategory) {
+        return List.of();
+    }
+
+    @Override
+    public ArticleDto delete(Integer id) {
+        return articleService.delete(id);
     }
 
 
