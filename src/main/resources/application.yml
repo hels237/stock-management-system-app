@@ -2,6 +2,13 @@
 spring:
   application:
     name: stock-management-system
+
+  springdoc:
+    swagger-ui:
+      path: /swagger-ui.html
+
+
+
   datasource:
     url: jdbc:postgresql://localhost:5432/stock_management_system
     username: hels
