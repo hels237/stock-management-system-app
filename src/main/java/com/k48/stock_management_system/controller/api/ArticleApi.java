@@ -5,6 +5,8 @@ import com.k48.stock_management_system.dto.LigneCmdeClientDto;
 import com.k48.stock_management_system.dto.LigneCmdeFournisseurDto;
 import com.k48.stock_management_system.dto.LigneVenteDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -15,46 +17,54 @@ public interface ArticleApi {
 
     @PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = " Enregistrer un article", description = "Cette methode permet de creer  un article")
-    @ApiResponse(responseCode = "200", description = "L'objet article cree / modifie")
-    @ApiResponse(responseCode ="400", description = "L'objet article n'est pas valide")
+    @ApiResponse(responseCode = "200", description = "L'objet article cree / modifie",content = @Content(mediaType = "application/json", schema = @Schema(implementation = ArticleDto.class)))
+    @ApiResponse(responseCode ="404", description = "L'objet article n'est pas valide")
     ArticleDto save(@RequestBody ArticleDto dto);
 
     @GetMapping(value = "/{idArticle}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary= "Rechercher un article par ID")
-    @ApiResponse(responseCode = "200",description = "L'article a ete trouve dans la BDD")
+    @ApiResponse(responseCode = "200",description = "L'article a ete trouve dans la BDD",content = @Content(mediaType = "application/json",schema = @Schema(implementation = ArticleDto.class)))
     @ApiResponse(responseCode = "404", description = "Aucun article n'existe dans la BDD avec l'ID fourni")
     ArticleDto findById(@PathVariable("idArticle") Integer id);
 
     @GetMapping(value = "/filter/{codeArticle}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Rechercher un article par CODE", description = "Cette methode permet de chercher un article par son CODE")
-
-    @ApiResponse(responseCode ="200", description = "L'article a ete trouve dans la BDD")
+    @ApiResponse(responseCode ="200", description = "L'article a ete trouve dans la BDD",content = @Content(mediaType = "application/json", schema = @Schema(implementation = ArticleDto.class)))
     @ApiResponse(responseCode = "404", description= "Aucun article n'existe dans la BDD avec le CODE fourni")
     ArticleDto findByCodeArticle(@PathVariable("codeArticle") String codeArticle);
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Renvoi la liste des articles", description = "Cette methode permet de chercher et renvoyer la liste des articles qui existent " + "dans la BD")
-    @ApiResponse(responseCode = "200", description = "La liste des article / Une liste vide")
+    @ApiResponse(responseCode = "200", description = "La liste des article / Une liste vide",content = @Content(mediaType = "application/json", schema = @Schema(implementation = ArticleDto.class, type = "array")))
     List<ArticleDto> findAll();
 
     @Operation(summary = "Renvoi la liste des lignes de vente d'un article", description = "Cette methode permet de chercher et renvoyer toutes les  lignes de vente d'un article")
     @GetMapping(value = "/historique/vente/{idArticle}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "200", description = "La liste des lignes de vente pour l'article", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LigneVenteDto.class, type = "array")))
+    @ApiResponse(responseCode = "404", description = "Aucune ligne de vente n'existe pour l'article avec l'ID fourni")
     List<LigneVenteDto> findHistoriqueVentes(@PathVariable("idArticle") Integer idArticle);
 
     @Operation(summary = "Renvoi la liste des lignes de commande d'un client pour un article", description = "Cette methode permet de chercher et renvoyer toutes les lignes de commande d'un client pour un article")
     @GetMapping(value = "/historique/commandeclient/{idArticle}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "200", description = "La liste des lignes de commande client pour l'article", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LigneCmdeClientDto.class, type = "array")))
+    @ApiResponse(responseCode = "404", description = "Aucune ligne de commande client n'existe pour l'article avec l'ID fourni")
     List<LigneCmdeClientDto> findHistoriqueCommandeClient(@PathVariable("idArticle") Integer idArticle);
 
     @Operation(summary = "Renvoi la liste des lignes de commande fournisseur d'un article", description = "Cette methode permet de chercher et renvoyer toutes les lignes de commande fournisseur où un article a été acheté ")
     @GetMapping(value =  "/historique/commandefournisseur/{idArticle}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "200", description = "La liste des lignes de commande fournisseur pour l'article", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LigneCmdeFournisseurDto.class, type = "array")))
+    @ApiResponse(responseCode = "404", description = "Aucune ligne de commande fournisseur n'existe pour l'article avec l'ID fourni")
     List<LigneCmdeFournisseurDto> findHistoriqueCommandeFournisseur(@PathVariable("idArticle") Integer idArticle);
 
     @Operation(summary = "Renvoi la liste des articles par ID de categorie", description = "Cette methode permet de chercher et renvoyer la liste des articles par ID de categorie")
     @GetMapping(value =  "/filter/category/{idCategory}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "200", description = "La liste des articles pour la categorie fournie", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ArticleDto.class, type = "array")))
+    @ApiResponse(responseCode = "404", description = "Aucun article n'existe dans la BDD pour la categorie fournie")
     List<ArticleDto> findAllArticleByIdCategory(@PathVariable("idCategory") Integer idCategory);
 
     @DeleteMapping(value = "/delete/{idArticle}")
     @Operation(summary = "Supprimer un article", description = "Cette methode permet de supprimer un article par ID")
-    @ApiResponse(responseCode ="200", description = "L'article a ete supprime")
+    @ApiResponse(responseCode ="200", description = "L'article a ete supprime",content = @Content(mediaType = "application/json", schema = @Schema(implementation = ArticleDto.class)))
+    @ApiResponse(responseCode = "404", description = "Aucun article n'existe dans la BDD avec l'ID fourni")
     ArticleDto delete(@PathVariable("idArticle") Integer id);
 }
