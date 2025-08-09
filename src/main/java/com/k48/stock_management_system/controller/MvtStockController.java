@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -15,7 +14,7 @@ import static com.k48.stock_management_system.utils.Constants.APP_ROOT;
 
 @Tag(name = "Mouvement de Stock", description = "API pour la gestion des mouvements de stock")
 @RestController
-@RequestMapping(APP_ROOT + "/mvtstock")
+@RequestMapping(APP_ROOT + "mvtstock")
 @RequiredArgsConstructor
 public class MvtStockController implements MvtStockApi {
 
