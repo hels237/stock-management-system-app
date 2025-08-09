@@ -16,29 +16,30 @@ import static com.k48.stock_management_system.utils.Constants.APP_ROOT;
 @RequiredArgsConstructor
 public class CategoryController implements CategoryApi {
 
+    private final CategoryService categoryService;
 
     @Override
     public CategoryDto save(CategoryDto dto) {
-        return null;
+        return categoryService.save(dto);
     }
 
     @Override
     public CategoryDto findById(Integer idCategory) {
-        return null;
+        return categoryService.findById(idCategory);
     }
 
     @Override
     public CategoryDto findByCode(String codeCategory) {
-        return null;
+        return categoryService.findByCode(codeCategory);
     }
 
     @Override
     public List<CategoryDto> findAll() {
-        return List.of();
+        return categoryService.findAll();
     }
 
     @Override
-    public void delete(Integer id) {
-
+    public CategoryDto delete(Integer id) {
+        return categoryService.delete(id);
     }
 }

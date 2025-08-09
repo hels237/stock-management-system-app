@@ -55,6 +55,7 @@ public interface CategoryApi {
     @DeleteMapping(value = APP_ROOT + "/categories/delete/{idCategory}")
     @Operation(summary= "Supprimer un article", description = "Cette methode permet de supprimer une categorie par ID")
     @ApiResponse(responseCode = "404", description = "Aucune categorie n'existe dans la BD avec l'ID fourni")
-    @ApiResponse(responseCode = "400", description = "La categorie n'est pas valide")
-    void delete(@PathVariable("idCategory") Integer id);
+    @ApiResponse(responseCode = "400", description = "La categorie n'est pas valide",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryDto.class)))
+    CategoryDto delete(@PathVariable("idCategory") Integer id);
 }
