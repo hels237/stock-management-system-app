@@ -3,6 +3,7 @@ package com.k48.stock_management_system.controller;
 import com.k48.stock_management_system.controller.api.CategoryApi;
 import com.k48.stock_management_system.dto.CategoryDto;
 import com.k48.stock_management_system.services.CategoryService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +13,8 @@ import java.util.List;
 import static com.k48.stock_management_system.utils.Constants.APP_ROOT;
 
 @RestController
-@RequestMapping(APP_ROOT+"/categories")
+@Tag(name = "Category ", description = "API pour la gestion des categories d'articles")
+@RequestMapping(APP_ROOT+"categories")
 @RequiredArgsConstructor
 public class CategoryController implements CategoryApi {
 

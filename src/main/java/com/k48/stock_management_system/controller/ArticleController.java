@@ -7,6 +7,7 @@ import com.k48.stock_management_system.dto.LigneCmdeClientDto;
 import com.k48.stock_management_system.dto.LigneCmdeFournisseurDto;
 import com.k48.stock_management_system.dto.LigneVenteDto;
 import com.k48.stock_management_system.services.ArticleService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,8 @@ import static com.k48.stock_management_system.utils.Constants.APP_ROOT;
 
 
 @RestController
-@RequestMapping(APP_ROOT+"/article")
+@Tag(name = "Articles", description = "API pour la gestion des articles")
+@RequestMapping(APP_ROOT+"articles")
 @RequiredArgsConstructor
 public class ArticleController implements ArticleApi {
 
