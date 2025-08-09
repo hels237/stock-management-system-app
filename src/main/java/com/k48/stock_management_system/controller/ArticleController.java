@@ -1,6 +1,5 @@
 package com.k48.stock_management_system.controller;
 
-
 import com.k48.stock_management_system.controller.api.ArticleApi;
 import com.k48.stock_management_system.dto.ArticleDto;
 import com.k48.stock_management_system.dto.LigneCmdeClientDto;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static com.k48.stock_management_system.utils.Constants.APP_ROOT;
-
 
 
 @RestController
@@ -66,6 +64,7 @@ public class ArticleController implements ArticleApi {
     public List<ArticleDto> findAllArticleByIdCategory(Integer idCategory) {
         return List.of();
     }
+
 
     @Override
     public ArticleDto delete(Integer id) {
