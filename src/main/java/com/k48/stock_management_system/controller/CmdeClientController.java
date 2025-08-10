@@ -18,7 +18,7 @@ import static com.k48.stock_management_system.utils.Constants.APP_ROOT;
 
 @Tag(name = "Commande Client", description = "API pour la gestion des commandes clients")
 @RestController
-@RequestMapping(APP_ROOT + "cmdeclient")
+@RequestMapping(APP_ROOT + "commandeclient")
 @RequiredArgsConstructor
 public class CmdeClientController implements CmdClientApi {
 
