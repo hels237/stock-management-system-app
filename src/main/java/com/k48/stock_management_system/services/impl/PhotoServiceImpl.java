@@ -37,6 +37,8 @@ public class PhotoServiceImpl implements PhotoService {
     @Override
     public PhotoUploadResponseDto uploadPhoto(MultipartFile file, String entityType, Integer entityId) {
         try {
+            ensureBucketExists();
+            
             String fileName = entityType + "/" + entityId + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
             
             InputStream inputStream = file.getInputStream();
@@ -61,6 +63,22 @@ public class PhotoServiceImpl implements PhotoService {
         } catch (Exception e) {
             log.error("Erreur lors du téléchargement de la photo", e);
             throw new InvalidOperationException("Erreur lors du téléchargement de la photo", ErrorCode.UPDATE_PHOTO_EXCEPTION);
+        }
+    }
+
+    private void ensureBucketExists() {
+        try {
+            boolean bucketExists = minioClient.bucketExists(
+                io.minio.BucketExistsArgs.builder().bucket(bucketName).build()
+            );
+            if (!bucketExists) {
+                minioClient.makeBucket(
+                    io.minio.MakeBucketArgs.builder().bucket(bucketName).build()
+                );
+                log.info("Bucket '{}' créé avec succès", bucketName);
+            }
+        } catch (Exception e) {
+            log.error("Erreur lors de la création du bucket", e);
         }
     }
 

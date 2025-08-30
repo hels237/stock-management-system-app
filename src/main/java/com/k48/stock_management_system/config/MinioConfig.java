@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class MinioConfig implements CommandLineRunner {
 
+    @Value("${minio.init.enabled:false}")
+    private boolean initEnabled;
+
     private final MinioClient minioClient;
     private final String bucketName;
 
@@ -28,6 +31,11 @@ public class MinioConfig implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        if (!initEnabled) {
+            log.info("Initialisation MinIO désactivée");
+            return;
+        }
+        
         try {
             boolean bucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
             if (!bucketExists) {
@@ -37,7 +45,7 @@ public class MinioConfig implements CommandLineRunner {
                 log.info("Bucket '{}' existe déjà", bucketName);
             }
         } catch (Exception e) {
-            log.error("Erreur lors de l'initialisation du bucket MinIO", e);
+            log.error("Erreur lors de l'initialisation du bucket MinIO: {}", e.getMessage());
         }
     }
 }

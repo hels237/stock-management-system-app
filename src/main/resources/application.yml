@@ -35,6 +35,8 @@ minio:
   access-key: ${MINIO_ACCESS_KEY:minioadmin}
   secret-key: ${MINIO_SECRET_KEY:minioadmin}
   bucket-name: ${MINIO_BUCKET_NAME:stock-photos}
+  init:
+    enabled: ${MINIO_INIT_ENABLED:false}
 
 server:
   port: 8081
