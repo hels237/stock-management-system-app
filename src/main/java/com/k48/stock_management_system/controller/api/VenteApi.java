@@ -14,7 +14,7 @@ public interface VenteApi {
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "L'objet vente créé ", content = @Content(mediaType = "application/json", schema = @Schema(implementation = VenteDto.class))),
-            @ApiResponse(responseCode = "401", description = "L'objet vente n'est pas valide")
+            @ApiResponse(responseCode = "400", description = "L'objet vente n'est pas valide")
     })
     @Operation(summary = "Enregistrer une vente", description = "Cette méthode permet de créer une vente")
     @PostMapping("/create")

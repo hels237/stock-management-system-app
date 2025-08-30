@@ -1,40 +1,34 @@
 package com.k48.stock_management_system.services.strategy;
 
-import com.flickr4java.flickr.FlickrException;
 import com.k48.stock_management_system.dto.ArticleDto;
+import com.k48.stock_management_system.dto.PhotoUploadResponseDto;
 import com.k48.stock_management_system.exceptions.ErrorCode;
 import com.k48.stock_management_system.exceptions.InvalidOperationException;
 import com.k48.stock_management_system.services.ArticleService;
-import com.k48.stock_management_system.services.FlickrService;
+import com.k48.stock_management_system.services.PhotoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.WebProperties.Resources.Chain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
-
-@Service()
+@Service
 @Slf4j
-public class SaveArticlePhoto   {
-/*    private  FlickrService flickrService;
-    private  ArticleService articleService;
+@RequiredArgsConstructor
+public class SaveArticlePhoto {
+    
+    private final PhotoService photoService;
+    private final ArticleService articleService;
 
-    @Autowired
-    public SaveArticlePhoto(FlickrService flickrService, ArticleService articleService) {
-        this.flickrService = flickrService;
-        this.articleService = articleService;
-    }
-
-    @Override
-    public ArticleDto savePhoto(Integer id, InputStream photo, String titre) throws FlickrException {
+    public ArticleDto savePhoto(Integer id, MultipartFile photo) {
         ArticleDto article = articleService.findById(id);
-        String urlPhoto = flickrService.savePhoto(photo, titre);
-        if (!StringUtils.hasLength(urlPhoto)) {
+        PhotoUploadResponseDto uploadResult = photoService.uploadPhoto(photo, "article", id);
+        
+        if (!StringUtils.hasLength(uploadResult.getUrl())) {
             throw new InvalidOperationException("Erreur lors de l'enregistrement de photo de l'article", ErrorCode.UPDATE_PHOTO_EXCEPTION);
         }
-        article.setPhoto(urlPhoto);
+        
+        article.setPhoto(uploadResult.getUrl());
         return articleService.save(article);
-    }*/
+    }
 }

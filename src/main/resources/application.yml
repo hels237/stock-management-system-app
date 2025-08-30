@@ -10,9 +10,9 @@ spring:
 
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/stock_management_system
-    username: hels
-    password: hels
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/stock_management_system}
+    username: ${SPRING_DATASOURCE_USERNAME:hels}
+    password: ${SPRING_DATASOURCE_PASSWORD:hels}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -29,6 +29,12 @@ spring:
     level:
       org.springframework: DEBUG
 
+# Configuration MinIO pour la gestion des photos
+minio:
+  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+  access-key: ${MINIO_ACCESS_KEY:minioadmin}
+  secret-key: ${MINIO_SECRET_KEY:minioadmin}
+  bucket-name: ${MINIO_BUCKET_NAME:stock-photos}
 
 server:
   port: 8081

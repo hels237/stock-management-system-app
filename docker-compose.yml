@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: stock-postgres
+    environment:
+      POSTGRES_DB: stock_management_system
+      POSTGRES_USER: hels
+      POSTGRES_PASSWORD: hels
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - stock-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: stock-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - stock-network
+
+  app:
+    build: .
+    container_name: stock-app
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_APPLICATION_NAME: stock-management-system
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/stock_management_system
+      SPRING_DATASOURCE_USERNAME: hels
+      SPRING_DATASOURCE_PASSWORD: hels
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create
+      SPRING_JPA_DATABASE: postgresql
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_JPA_SHOW_SQL: true
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: true
+      SERVER_PORT: 8081
+      SPRINGDOC_SWAGGER_UI_PATH: /swagger-ui.html
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET_NAME: stock-photos
+    depends_on:
+      - postgres
+      - minio
+    networks:
+      - stock-network
+
+volumes:
+  postgres_data:
+  minio_data:
+
+networks:
+  stock-network:
+    driver: bridge

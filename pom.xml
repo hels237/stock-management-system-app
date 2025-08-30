@@ -40,9 +40,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.flickr4java</groupId>
-			<artifactId>flickr4java</artifactId>
-			<version>3.0.4</version>
+			<groupId>io.minio</groupId>
+			<artifactId>minio</artifactId>
+			<version>8.5.7</version>
 		</dependency>
 
 		<dependency>
