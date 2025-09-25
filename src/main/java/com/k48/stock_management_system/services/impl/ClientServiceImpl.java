@@ -26,11 +26,39 @@ public class ClientServiceImpl implements ClientService {
     private final ObjectValidator<ClientDto> objectValidator;
     private final ClientRepository clientRepository;
     private final CmdeClientRepository commandeClientRepository;
+    private final com.k48.stock_management_system.repositories.EntrepriseRepository entrepriseRepository;
 
 
     @Override
     public ClientDto save(ClientDto clientDto) {
         objectValidator.validate(clientDto);
+        
+        // Vérifier si le client n'existe pas déjà par email
+        if (clientDto.getEmail() != null) {
+            Optional<Client> existingByEmail = clientRepository.findByEmail(clientDto.getEmail());
+            if (existingByEmail.isPresent()) {
+                log.error("Un client avec l'email {} existe déjà", clientDto.getEmail());
+                throw new InvalidOperationException(
+                    "Un client avec cet email existe déjà", 
+                    ErrorCode.CLIENT_ALREADY_EXISTS
+                );
+            }
+        }
+        
+        // Vérifier que l'entreprise existe
+        if (clientDto.getEntrepriseId() != null) {
+            entrepriseRepository.findById(clientDto.getEntrepriseId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                    "Entreprise avec l'ID " + clientDto.getEntrepriseId() + " non trouvée",
+                    ErrorCode.ENTREPPRISE_NOT_FOUND
+                ));
+        } else {
+            throw new InvalidOperationException(
+                "L'entreprise est obligatoire pour créer un client", 
+                ErrorCode.ENTREPPRISE_NOT_FOUND
+            );
+        }
+        
         return ClientDto.fromEntity(clientRepository.save(ClientDto.toEntity(clientDto)));
     }
 

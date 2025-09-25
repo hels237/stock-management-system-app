@@ -36,6 +36,7 @@ public class CmdeClientDto {
         }
         return CmdeClientDto
                 .builder()
+                .id(cmdeClient.getId())
                 .clientDto(ClientDto.fromEntity(cmdeClient.getClient()))
                 .code(cmdeClient.getCode())
                 .dateCmde(cmdeClient.getDateCmde())
