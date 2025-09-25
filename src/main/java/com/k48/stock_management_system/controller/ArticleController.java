@@ -23,7 +23,7 @@ import static com.k48.stock_management_system.utils.Constants.APP_ROOT;
 @RequiredArgsConstructor
 public class ArticleController implements ArticleApi {
 
-    private  ArticleService articleService;
+    private final ArticleService articleService;
 
     @Override
     public ArticleDto save(ArticleDto dto) {

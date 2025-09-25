@@ -8,14 +8,8 @@ import com.k48.stock_management_system.dto.LigneVenteDto;
 import com.k48.stock_management_system.exceptions.EntityNotFoundException;
 import com.k48.stock_management_system.exceptions.ErrorCode;
 import com.k48.stock_management_system.exceptions.InvalidOperationException;
-import com.k48.stock_management_system.model.Article;
-import com.k48.stock_management_system.model.LigneCmdeClient;
-import com.k48.stock_management_system.model.LigneCmdeFournisseur;
-import com.k48.stock_management_system.model.LigneVente;
-import com.k48.stock_management_system.repositories.ArticleRepository;
-import com.k48.stock_management_system.repositories.LigneCmdeClientRepository;
-import com.k48.stock_management_system.repositories.LigneCmdeFournisseurRepository;
-import com.k48.stock_management_system.repositories.LigneVenteRepository;
+import com.k48.stock_management_system.model.*;
+import com.k48.stock_management_system.repositories.*;
 import com.k48.stock_management_system.services.ArticleService;
 import com.k48.stock_management_system.validator.ObjectValidator;
 import lombok.RequiredArgsConstructor;
@@ -36,18 +30,70 @@ public  class ArticleServiceImpl implements ArticleService {
     private final LigneVenteRepository venteRepository;
     private final LigneCmdeFournisseurRepository commandeFournisseurRepository;
     private final LigneCmdeClientRepository commandeClientRepository;
-
     private final ObjectValidator<ArticleDto> objectValidator;
+    private final CategoryRepository categoryRepository;
+    private final EntrepriseRepository entrepriseRepository;
 
 
 
 
     @Override
     public ArticleDto save(ArticleDto articleDto) {
-        //validate the object
+        //valider l'object
         objectValidator.validate(articleDto);
+        
+        // Vérifier l'unicité du code article
+        if (articleDto.getCodeArticle() != null) {
+            Optional<Article> existingByCode = articleRepository.findByCodeArticle(articleDto.getCodeArticle());
+            if (existingByCode.isPresent()) {
+                log.error("Un article avec le code {} existe déjà", articleDto.getCodeArticle());
+                throw new InvalidOperationException(
+                    "Un article avec ce code existe déjà", 
+                    ErrorCode.ARTICLE_ALREADY_EXISTS
+                );
+            }
+        }
 
-        return ArticleDto.fromEntity(articleRepository.save(ArticleDto.toEntity(articleDto)));
+        Category category ;
+        // Vérifier que la catégorie existe
+        if (articleDto.getCategoryId() != null) {
+            category = categoryRepository.findById(articleDto.getCategoryId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                    "Catégorie avec l'ID " + articleDto.getCategoryId() + " non trouvée",
+                    ErrorCode.CATEGORIE_NOT_FOUND
+                ));
+        } else {
+            throw new InvalidOperationException(
+                "La catégorie est obligatoire pour créer un article", 
+                ErrorCode.CATEGORIE_NOT_FOUND
+            );
+        }
+        
+        Entreprise entreprise;
+        // Vérifier que l'entreprise existe
+        if (articleDto.getEntrepriseId() != null) {
+            entreprise = entrepriseRepository.findById(articleDto.getEntrepriseId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                    "Entreprise avec l'ID " + articleDto.getEntrepriseId() + " non trouvée",
+                    ErrorCode.ENTREPPRISE_NOT_FOUND
+                ));
+        } else {
+            throw new InvalidOperationException(
+                "L'entreprise est obligatoire pour créer un article", 
+                ErrorCode.ENTREPPRISE_NOT_FOUND
+            );
+        }
+        Article article = Article.builder()
+                                .codeArticle(articleDto.getCodeArticle())
+                                .designation(articleDto.getDesignation())
+                                .tauxTva(articleDto.getTauxTva())
+                                .prixUnitaireHT(articleDto.getPrixUnitaireHT())
+                                .prixUnitaireTTc(articleDto.getPrixUnitaireTTc())
+                                .category(category)
+                                .entreprise(entreprise)
+                                .build();
+
+        return ArticleDto.fromEntity(articleRepository.save(article));
     }
 
     @Override

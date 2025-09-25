@@ -24,12 +24,12 @@ public interface EntrepriseApi {
     @ApiResponse(responseCode = "404", description = "Aucune entreprise n'existe avec l'ID fourni")
     EntrepriseDto findById(@PathVariable("idEntreprise") Integer id);
 
-    @GetMapping(ENTREPRISE_ENDPOINT + "/all")
+    @GetMapping("/all")
     @Operation(summary = "Trouver toutes les entreprises", description = "Permet de récupérer la liste de toutes les entreprises")
     @ApiResponse(responseCode = "200", description = "La liste des entreprises", content = @Content(mediaType = "application/json", schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = EntrepriseDto.class, type = "array")))
     List<EntrepriseDto> findAll();
 
-    @DeleteMapping(ENTREPRISE_ENDPOINT + "/delete/{idEntreprise}")
+    @DeleteMapping("/delete/{idEntreprise}")
     @Operation(summary = "Supprimer une entreprise", description = "Permet de supprimer une entreprise en fonction de son ID")
     @ApiResponse(responseCode = "200", description = "Entreprise supprimée avec succès", content = @Content(mediaType = "application/json", schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = EntrepriseDto.class)))
     @ApiResponse(responseCode = "404", description = "Aucune entreprise n'existe avec l'ID fourni")

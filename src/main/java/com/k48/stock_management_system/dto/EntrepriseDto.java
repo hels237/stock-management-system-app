@@ -44,6 +44,7 @@ public class EntrepriseDto {
                 builder()
                 .codeFiscal(entreprise.getCodeFiscal())
                 .nom(entreprise.getNom())
+                .description(entreprise.getDescription())
                 .email(entreprise.getEmail())
                 .build();
     }
@@ -56,6 +57,7 @@ public class EntrepriseDto {
         return Entreprise.
                 builder()
                 .nom(entrepriseDto.getNom())
+                .description(entrepriseDto.getDescription())
                 .email(entrepriseDto.getEmail())
                 .codeFiscal(entrepriseDto.getCodeFiscal())
                 .build();

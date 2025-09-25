@@ -35,11 +35,11 @@ public class CategoryDto {
         }
         return CategoryDto
                 .builder()
+                .categorieId(category.getId())
                 .code(category.getCode())
                 .description(category.getDescription())
                 .designation(category.getDesignation())
                 .entrepriseId(category.getIdEntreprise())
-                .articleDtos(category.getArticles().stream().map(ArticleDto::fromEntity).toList())
                 .build();
     }
 
@@ -54,7 +54,6 @@ public class CategoryDto {
                 .description(categoryDto.getDescription())
                 .designation(categoryDto.getDesignation())
                 .idEntreprise(categoryDto.getEntrepriseId())
-                .articles(categoryDto.getArticleDtos().stream().map(ArticleDto::toEntity).toList())
                 .build();
 
     }

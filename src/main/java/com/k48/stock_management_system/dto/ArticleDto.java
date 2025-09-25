@@ -2,6 +2,8 @@ package com.k48.stock_management_system.dto;
 
 
 import com.k48.stock_management_system.model.Article;
+import com.k48.stock_management_system.model.Category;
+import com.k48.stock_management_system.model.Entreprise;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,12 +31,11 @@ public class ArticleDto {
 
     private BigDecimal prixUnitaireTTc;
 
-    private String Photo;
-
     private Integer entrepriseId;
 
-    private CategoryDto categoryDto;
+    private Integer categoryId;
 
+    private String photo;
 
     private List<LigneCmdeClientDto> ligneCmdeClientDtos;
 
@@ -51,13 +52,14 @@ public class ArticleDto {
         }
         return ArticleDto
                 .builder()
+                .id(article.getId())
                 .codeArticle(article.getCodeArticle())
                 .designation(article.getDesignation())
                 .prixUnitaireHT(article.getPrixUnitaireHT())
                 .tauxTva(article.getTauxTva())
                 .prixUnitaireTTc(article.getPrixUnitaireTTc())
-                .entrepriseId(article.getIdEntreprise())
-                .categoryDto(CategoryDto.fromEntity(article.getCategory()))
+                .entrepriseId(article.getEntreprise() != null ? article.getEntreprise().getId() : null)
+                .categoryId(article.getCategory() != null ? article.getCategory().getId() : null)
                 .build();
     }
 
@@ -69,13 +71,16 @@ public class ArticleDto {
 
         return Article.
                 builder()
+                .id(articleDto.getId())
                 .codeArticle(articleDto.getCodeArticle())
                 .designation(articleDto.getDesignation())
                 .prixUnitaireHT(articleDto.getPrixUnitaireHT())
                 .prixUnitaireTTc(articleDto.getPrixUnitaireTTc())
                 .tauxTva(articleDto.getTauxTva())
-                .category(CategoryDto.toEntity(articleDto.categoryDto))
-                .idEntreprise(articleDto.getEntrepriseId())
+                .category(articleDto.getCategoryId() != null ?
+                    Category.builder().id(articleDto.getCategoryId()).build() : null)
+                .entreprise(articleDto.getEntrepriseId()!= null ?
+                    Entreprise.builder().id(articleDto.getEntrepriseId()).build() : null)
                 .build();
     }
 

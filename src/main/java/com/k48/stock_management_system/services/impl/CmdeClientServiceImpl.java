@@ -56,12 +56,12 @@ public class CmdeClientServiceImpl implements CmdeClientService {
         // verifier que l'article existe en BD pour chaque ligne de commande que l'on veut enregistrer
         if(cmdeClientDto.getLigneCmdeClientDtos() != null) {
             cmdeClientDto.getLigneCmdeClientDtos().forEach(ligCmdClt ->{
-                if(ligCmdClt.getArticleDto() != null) {
+                if(ligCmdClt.getArticleId() != null) {
                     Article article =
                             articleRepository
-                                    .findById(ligCmdClt.getArticleDto().getId())
+                                    .findById(ligCmdClt.getArticleId())
                                     .orElseThrow(
-                                            ()-> new EntityNotFoundException("article with ID {} "+ligCmdClt.getArticleDto().getId()+"not found in DB!")
+                                            ()-> new EntityNotFoundException("article with ID {} "+ligCmdClt.getArticleId()+"not found in DB!")
                                     );
 
                 }else{

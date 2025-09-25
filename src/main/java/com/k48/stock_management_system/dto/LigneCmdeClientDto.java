@@ -22,7 +22,7 @@ public class LigneCmdeClientDto {
     @JsonIgnore
     private CmdeClient cmdeClient;
 
-    private ArticleDto articleDto;
+    private Integer articleId;
 
     private Integer entrepriseId;
 
@@ -33,10 +33,11 @@ public class LigneCmdeClientDto {
             return null;
         }
         return LigneCmdeClientDto
-
                 .builder()
+                .id(ligneCmdeClient.getId())
                 .prixUnitaire(ligneCmdeClient.getPrixUnitaire())
                 .quantite(ligneCmdeClient.getQuantite())
+                .articleId(ligneCmdeClient.getArticle() != null ? ligneCmdeClient.getArticle().getId() : null)
                 .entrepriseId(ligneCmdeClient.getIdEntreprise())
                 .build();
     }
@@ -48,8 +49,11 @@ public class LigneCmdeClientDto {
         }
         return LigneCmdeClient
                 .builder()
+                .id(ligneCmdeClientDto.getId())
                 .prixUnitaire(ligneCmdeClientDto.getPrixUnitaire())
                 .quantite(ligneCmdeClientDto.getQuantite())
+                .article(ligneCmdeClientDto.getArticleId() != null ? 
+                    com.k48.stock_management_system.model.Article.builder().id(ligneCmdeClientDto.getArticleId()).build() : null)
                 .idEntreprise(ligneCmdeClientDto.getEntrepriseId())
                 .build();
     }

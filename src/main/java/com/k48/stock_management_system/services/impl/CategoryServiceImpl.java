@@ -32,6 +32,19 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto save(CategoryDto categoryDto) {
 
         objectValidator.validate(categoryDto);
+        
+        // Vérifier l'unicité par code
+        if (categoryDto.getCode() != null) {
+            Optional<Category> existingByCode = categoryRepository.findByCode(categoryDto.getCode());
+            if (existingByCode.isPresent()) {
+                log.error("Une catégorie avec le code {} existe déjà", categoryDto.getCode());
+                throw new InvalidOperationException(
+                    "Une catégorie avec ce code existe déjà", 
+                    ErrorCode.CATEGORY_ALREADY_EXISTS
+                );
+            }
+        }
+        
         return CategoryDto.fromEntity(categoryRepository.save(CategoryDto.toEntity(categoryDto)));
     }
 
