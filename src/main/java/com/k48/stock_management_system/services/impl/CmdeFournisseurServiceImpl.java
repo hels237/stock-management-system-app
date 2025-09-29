@@ -33,7 +33,7 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
     private final CmdeFournisseurRepository cmdeFournisseurRepository;
     private final ObjectValidator<CmdeFournisseurDto> objectValidator;
     private final LigneCmdeFournisseurRepository ligneCmdeFournisseurRepository;
-    private MvtStockService mvtStkService;
+    private final MvtStockService mvtStkService;
     private final ObjectValidator<ArticleDto> objectValidatorArticleDto;
 
     @Override
@@ -41,6 +41,18 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
 
         // validate the cmdeFournisseurDto
         objectValidator.validate(cmdFournisseurDto);
+        
+        // Vérifier l'unicité du code de commande
+        if (cmdFournisseurDto.getCode() != null) {
+            Optional<CmdeFournisseur> existingByCode = cmdeFournisseurRepository.findByCode(cmdFournisseurDto.getCode());
+            if (existingByCode.isPresent()) {
+                log.error("Une commande fournisseur avec le code {} existe déjà", cmdFournisseurDto.getCode());
+                throw new InvalidOperationException(
+                    "Une commande fournisseur avec ce code existe déjà", 
+                    ErrorCode.CMDE_FOURNISSEUR_ALREADY_EXISTS
+                );
+            }
+        }
 
         // verifie si la commande est deja livree
         if (cmdFournisseurDto.getId() != null && cmdFournisseurDto.isCommandeLivree()) {
@@ -71,21 +83,31 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
             log.warn("No Article found in DB we can't finalize the save operation");
         }
 
+        // Convertir le DTO en entité
+        CmdeFournisseur cmdeFournisseur = CmdeFournisseurDto.toEntity(cmdFournisseurDto);
+        
+        // Associer le fournisseur existant (récupéré de la base)
+        cmdeFournisseur.setFournisseur(supplier);
+        
+        // Définir la date de la commande
+        cmdeFournisseur.setDateCmde(Instant.now());
+        
+        // Définir l'état initial selon la logique métier
+        cmdeFournisseur.setEtatCommande(EtatCmde.EN_PREPARATION);
 
-
-        cmdFournisseurDto.setDateCmde(Instant.now());
         // save the cmdeFournisseur
-        CmdeFournisseur cmdSaved = cmdeFournisseurRepository.save(CmdeFournisseurDto.toEntity(cmdFournisseurDto));
+        CmdeFournisseur cmdSaved = cmdeFournisseurRepository.save(cmdeFournisseur);
+        final CmdeFournisseur finalSavedCmdeFournisseur = cmdSaved;
 
         // save the LineCmdeFournisseur
         if(cmdFournisseurDto.getLigneCmdeFournisseurDtos() != null) {
             cmdFournisseurDto.getLigneCmdeFournisseurDtos().forEach(ligcmdf -> {
                 LigneCmdeFournisseur ligneCmdeFournisseur = LigneCmdeFournisseurDto.toEntity(ligcmdf);
-                ligneCmdeFournisseur.setCmdeFournisseur(cmdSaved);
+                ligneCmdeFournisseur.setCmdeFournisseur(finalSavedCmdeFournisseur);
                 ligneCmdeFournisseurRepository.save(ligneCmdeFournisseur);
 
-                // entree en stock
-                effectuerEntree(ligneCmdeFournisseur);
+                // Pas d'entrée de stock lors de la création (EN_PREPARATION)
+                // Les entrées se feront lors du passage à l'état VALIDEE
             });
         }
         return CmdeFournisseurDto.fromEntity(cmdSaved);
@@ -170,20 +192,82 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
 
     @Override
     public CmdeFournisseurDto updateEtatCommande(Integer idCommande, EtatCmde etatCommande) {
+        // verifier que l'ID de la commande n'est pas null
         checkIdCommande(idCommande);
-        if (!StringUtils.hasLength(String.valueOf(etatCommande))) {
-            log.error("L'etat de la commande fournisseur is NULL");
-            throw new InvalidOperationException("Impossible de modifier l'etat de la commande avec un etat null",
+
+        // verifier que l'etat de commande n'est pas null
+        if (etatCommande == null) {
+            log.error("L'état de la commande est NULL");
+            throw new InvalidOperationException("Impossible de modifier l'état de la commande avec un état null",
                     ErrorCode.CMDE_FOURNISSEUR_NON_MODIFIABLE);
         }
-        CmdeFournisseurDto commandeFournisseur = checkEtatCommande(idCommande);
-        commandeFournisseur.setEtatCommande(etatCommande);
 
-        CmdeFournisseur savedCommande = cmdeFournisseurRepository.save(CmdeFournisseurDto.toEntity(commandeFournisseur));
-        if (commandeFournisseur.isCommandeLivree()) {
-            updateMvtStk(idCommande);
+        CmdeFournisseurDto commandeFournisseurDto = checkEtatCommande(idCommande);
+        EtatCmde etatActuel = commandeFournisseurDto.getEtatCommande();
+        
+        // Valider la transition d'état
+        if (!isTransitionValide(etatActuel, etatCommande)) {
+            throw new InvalidOperationException(
+                String.format("Transition invalide de %s vers %s", etatActuel, etatCommande),
+                ErrorCode.CMDE_FOURNISSEUR_NON_MODIFIABLE
+            );
         }
-        return CmdeFournisseurDto.fromEntity(savedCommande);
+        
+        // Appliquer la logique métier selon le nouvel état
+        switch (etatCommande) {
+            case VALIDEE:
+                // Vérifier que la commande a des lignes
+                if (commandeFournisseurDto.getLigneCmdeFournisseurDtos() == null || 
+                    commandeFournisseurDto.getLigneCmdeFournisseurDtos().isEmpty()) {
+                    throw new InvalidOperationException(
+                        "Impossible de valider une commande sans articles",
+                        ErrorCode.CMDE_FOURNISSEUR_NON_MODIFIABLE
+                    );
+                }
+                // Effectuer les entrées de stock
+                effectuerEntreesStock(idCommande);
+                break;
+                
+            case LIVREE:
+                // Vérifier que la commande était validée
+                if (etatActuel != EtatCmde.VALIDEE) {
+                    throw new InvalidOperationException(
+                        "Seule une commande validée peut être livrée",
+                        ErrorCode.CMDE_FOURNISSEUR_NON_MODIFIABLE
+                    );
+                }
+                break;
+        }
+
+        // Récupérer l'entité existante et modifier seulement l'état
+        CmdeFournisseur cmdeFournisseur = cmdeFournisseurRepository.findById(idCommande)
+            .orElseThrow(() -> new EntityNotFoundException(
+                "Commande fournisseur non trouvée avec l'ID " + idCommande,
+                ErrorCode.CMDE_FOURNISSEUR_NOT_FOUND
+            ));
+        
+        cmdeFournisseur.setEtatCommande(etatCommande);
+        CmdeFournisseur savedCmdFournisseur = cmdeFournisseurRepository.save(cmdeFournisseur);
+
+        return CmdeFournisseurDto.fromEntity(savedCmdFournisseur);
+    }
+    
+    private boolean isTransitionValide(EtatCmde etatActuel, EtatCmde nouvelEtat) {
+        // Si l'état actuel est null, on peut aller vers EN_PREPARATION ou VALIDEE
+        if (etatActuel == null) {
+            return nouvelEtat == EtatCmde.EN_PREPARATION || nouvelEtat == EtatCmde.VALIDEE;
+        }
+        
+        return switch (etatActuel) {
+            case EN_PREPARATION -> nouvelEtat == EtatCmde.VALIDEE;
+            case VALIDEE -> nouvelEtat == EtatCmde.LIVREE;
+            case LIVREE -> false; // Aucune transition possible depuis LIVREE
+        };
+    }
+    
+    private void effectuerEntreesStock(Integer idCommande) {
+        List<LigneCmdeFournisseur> lignes = ligneCmdeFournisseurRepository.findAllByCmdeFournisseurId(idCommande);
+        lignes.forEach(this::effectuerEntree);
     }
 
     @Override
@@ -209,22 +293,37 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
     @Override
     public CmdeFournisseurDto updateFournisseur(Integer idCommande, Integer idFournisseur) {
         checkIdCommande(idCommande);
+        
         if (idFournisseur == null) {
             log.error("L'ID du fournisseur is NULL");
             throw new InvalidOperationException("Impossible de modifier l'etat de la commande avec un ID fournisseur null",
                     ErrorCode.CMDE_FOURNISSEUR_NON_MODIFIABLE);
         }
-        CmdeFournisseurDto commandeFournisseur = checkEtatCommande(idCommande);
-        Optional<Fournisseur> fournisseurOptional = fournisseurRepository.findById(idFournisseur);
-        if (fournisseurOptional.isEmpty()) {
-            throw new EntityNotFoundException(
-                    "Aucun fournisseur n'a ete trouve avec l'ID " + idFournisseur, ErrorCode.FOURNISSEUR_NOT_FOUND);
-        }
-        commandeFournisseur.setFournisseurDto(FournisseurDto.fromEntity(fournisseurOptional.get()));
 
-        return CmdeFournisseurDto.fromEntity(
-                cmdeFournisseurRepository.save(CmdeFournisseurDto.toEntity(commandeFournisseur))
-        );
+        // Charger la commande existante
+        CmdeFournisseur cmdeFournisseur = cmdeFournisseurRepository.findById(idCommande)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Aucune commande fournisseur trouvée avec l'ID " + idCommande,
+                        ErrorCode.CMDE_FOURNISSEUR_NOT_FOUND
+                ));
+
+        // Vérifier l'état de la commande (si besoin)
+        checkEtatCommande(idCommande);
+
+        // Charger le fournisseur
+        Fournisseur fournisseur = fournisseurRepository.findById(idFournisseur)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Aucun fournisseur trouvé avec l'ID " + idFournisseur,
+                        ErrorCode.FOURNISSEUR_NOT_FOUND
+                ));
+
+        // Associer le fournisseur à la commande
+        cmdeFournisseur.setFournisseur(fournisseur);
+
+        // Sauvegarder la commande mise à jour
+        CmdeFournisseur savedCmdeFournisseur = cmdeFournisseurRepository.save(cmdeFournisseur);
+
+        return CmdeFournisseurDto.fromEntity(savedCmdeFournisseur);
     }
 
     @Override

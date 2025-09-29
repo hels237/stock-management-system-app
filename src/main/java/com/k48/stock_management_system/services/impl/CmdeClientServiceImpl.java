@@ -44,8 +44,20 @@ public class CmdeClientServiceImpl implements CmdeClientService {
 
         //valider la commande
         objectValidator.validate(cmdeClientDto);
+        
+        // Vérifier l'unicité du code de commande
+        if (cmdeClientDto.getCode() != null) {
+            Optional<CmdeClient> existingByCode = cmdeClientRepository.findByCode(cmdeClientDto.getCode());
+            if (existingByCode.isPresent()) {
+                log.error("Une commande client avec le code {} existe déjà", cmdeClientDto.getCode());
+                throw new InvalidOperationException(
+                    "Une commande client avec ce code existe déjà", 
+                    ErrorCode.CMDE_CLIENT_ALREADY_EXISTS
+                );
+            }
+        }
 
-        // verifier que le client  existe dans la BD
+        // verifier que le client  existe et le recuperer dans la BD
         Client client =
                 clientRepository
                         .findById(cmdeClientDto.getClientDto().getId())
@@ -72,23 +84,32 @@ public class CmdeClientServiceImpl implements CmdeClientService {
 
         }
 
+        // Convertir le DTO en entité
+        CmdeClient cmdeClient = CmdeClientDto.toEntity(cmdeClientDto);
+
+        // Associer le client existant (récupéré de la base)
+        cmdeClient.setClient(client);
 
         // Définir la date de la commande
-        cmdeClientDto.setDateCmde(Instant.now());
+        cmdeClient.setDateCmde(Instant.now());
+        
+        // Définir l'état initial selon la logique métier
+        cmdeClient.setEtatCommande(EtatCmde.EN_PREPARATION);
 
         // if everything is good save the cmdClient
-        CmdeClient cmdeClient = cmdeClientRepository.save(CmdeClientDto.toEntity(cmdeClientDto));
+        cmdeClient = cmdeClientRepository.save(cmdeClient);
+        final CmdeClient finalSavedCmdeClient = cmdeClient;
 
         // save the LineCmdClient we can't persist the ligneCmdeClient without knowing  whose cmdClient it's belong to
         if(cmdeClientDto.getLigneCmdeClientDtos() != null) {
 
             cmdeClientDto.getLigneCmdeClientDtos().forEach(ligCmdClt ->{
                 LigneCmdeClient ligneCmdeClient = LigneCmdeClientDto.toEntity(ligCmdClt);
-                ligneCmdeClient.setCmdeClient( cmdeClient );
+                ligneCmdeClient.setCmdeClient(finalSavedCmdeClient);
                 ligneCmdeClientRepository.save(ligneCmdeClient);
-
-                effectuerSortie(ligneCmdeClient);
-
+                
+                // Pas de sortie de stock lors de la création (EN_PREPARATION)
+                // Les sorties se feront lors du passage à l'état VALIDEE
             });
         }
 
@@ -110,14 +131,71 @@ public class CmdeClientServiceImpl implements CmdeClientService {
         }
 
         CmdeClientDto commandeClientDto = checkEtatCommande(idCommande);
-        commandeClientDto.setEtatCommande(etatCommande);
-
-        CmdeClient savedCmdClt = cmdeClientRepository.save(CmdeClientDto.toEntity(commandeClientDto));
-        if (commandeClientDto.isCommandeLivree()) {
-            updateMvtStk(idCommande);
+        EtatCmde etatActuel = commandeClientDto.getEtatCommande();
+        
+        // Valider la transition d'état
+        if (!isTransitionValide(etatActuel, etatCommande)) {
+            throw new InvalidOperationException(
+                String.format("Transition invalide de %s vers %s", etatActuel, etatCommande),
+                ErrorCode.CMDE_CLIENT_NON_MODIFIABLE
+            );
+        }
+        
+        // Appliquer la logique métier selon le nouvel état
+        switch (etatCommande) {
+            case VALIDEE:
+                // Vérifier que la commande a des lignes
+                if (commandeClientDto.getLigneCmdeClientDtos() == null || 
+                    commandeClientDto.getLigneCmdeClientDtos().isEmpty()) {
+                    throw new InvalidOperationException(
+                        "Impossible de valider une commande sans articles",
+                        ErrorCode.CMDE_CLIENT_NON_MODIFIABLE
+                    );
+                }
+                // Effectuer les sorties de stock
+                effectuerSortiesStock(idCommande);
+                break;
+                
+            case LIVREE:
+                // Vérifier que la commande était validée
+                if (etatActuel != EtatCmde.VALIDEE) {
+                    throw new InvalidOperationException(
+                        "Seule une commande validée peut être livrée",
+                        ErrorCode.CMDE_CLIENT_NON_MODIFIABLE
+                    );
+                }
+                break;
         }
 
-        return  CmdeClientDto.fromEntity(savedCmdClt);
+        // Récupérer l'entité existante et modifier seulement l'état
+        CmdeClient cmdeClient = cmdeClientRepository.findById(idCommande)
+            .orElseThrow(() -> new EntityNotFoundException(
+                "Commande client non trouvée avec l'ID " + idCommande,
+                ErrorCode.CMDE_CLIENT_NOT_FOUND
+            ));
+        
+        cmdeClient.setEtatCommande(etatCommande);
+        CmdeClient savedCmdClt = cmdeClientRepository.save(cmdeClient);
+
+        return CmdeClientDto.fromEntity(savedCmdClt);
+    }
+    
+    private boolean isTransitionValide(EtatCmde etatActuel, EtatCmde nouvelEtat) {
+        // Si l'état actuel est null, on peut aller vers EN_PREPARATION ou VALIDEE
+        if (etatActuel == null) {
+            return nouvelEtat == EtatCmde.EN_PREPARATION || nouvelEtat == EtatCmde.VALIDEE;
+        }
+        
+        return switch (etatActuel) {
+            case EN_PREPARATION -> nouvelEtat == EtatCmde.VALIDEE;
+            case VALIDEE -> nouvelEtat == EtatCmde.LIVREE;
+            case LIVREE -> false; // Aucune transition possible depuis LIVREE
+        };
+    }
+    
+    private void effectuerSortiesStock(Integer idCommande) {
+        List<LigneCmdeClient> lignes = ligneCmdeClientRepository.findAllByCmdeClientId(idCommande);
+        lignes.forEach(this::effectuerSortie);
     }
 
     @Override
@@ -125,14 +203,29 @@ public class CmdeClientServiceImpl implements CmdeClientService {
         checkIdCommande(idCommande);
         checkIdLigneCommande(idLigneCommande);
 
-        if (quantite == null || quantite.compareTo(BigDecimal.ZERO) == 0) {
-            log.error("L'ID de la ligne commande is NULL");
-            throw new InvalidOperationException("Impossible de modifier l'etat de la commande avec une quantite null ou ZERO",
+        if (quantite == null || quantite.compareTo(BigDecimal.ZERO) <= 0) {
+            log.error("La quantité est invalide");
+            throw new InvalidOperationException("Impossible de modifier avec une quantité null ou négative",
                     ErrorCode.CMDE_CLIENT_NON_MODIFIABLE);
         }
 
         CmdeClientDto commandeClientDto = checkEtatCommande(idCommande);
+        
+        // Vérifier que la modification est autorisée selon l'état
+        if (commandeClientDto.getEtatCommande() == EtatCmde.LIVREE) {
+            throw new InvalidOperationException(
+                "Impossible de modifier une commande livrée",
+                ErrorCode.CMDE_CLIENT_NON_MODIFIABLE
+            );
+        }
+
         Optional<LigneCmdeClient> ligneCommandeClientOptional = ligneCmdeClientRepository.findById(idLigneCommande);
+        if (ligneCommandeClientOptional.isEmpty()) {
+            throw new EntityNotFoundException(
+                "Ligne de commande non trouvée avec l'ID " + idLigneCommande,
+                ErrorCode.lIGNE_CMDE_CLIENT_NOT_FOUND
+            );
+        }
 
         LigneCmdeClient ligneCommandeClient = ligneCommandeClientOptional.get();
         ligneCommandeClient.setQuantite(quantite);
@@ -143,24 +236,47 @@ public class CmdeClientServiceImpl implements CmdeClientService {
 
     @Override
     public CmdeClientDto updateClient(Integer idCommande, Integer idClient) {
+
         checkIdCommande(idCommande);
+
         if (idClient == null) {
             log.error("L'ID du client is NULL");
             throw new InvalidOperationException("Impossible de modifier l'etat de la commande avec un ID client null",
                     ErrorCode.CMDE_CLIENT_NON_MODIFIABLE);
         }
-        CmdeClientDto commandeClientDto = checkEtatCommande(idCommande);
+
+        // Charger la commande existante
+        CmdeClient cmdeClient = cmdeClientRepository.findById(idCommande)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Aucune commande client trouvée avec l'ID " + idCommande,
+                        ErrorCode.CMDE_CLIENT_NOT_FOUND
+                ));
+
+        // Vérifier l'état de la commande (si besoin)
+        checkEtatCommande(idCommande);
+
+        // Charger le client
+        Client client = clientRepository.findById(idClient)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Aucun client trouvé avec l'ID " + idClient,
+                        ErrorCode.CLIENT_NOT_FOUND
+                ));
+
+
         Optional<Client> clientOptional = clientRepository.findById(idClient);
         if (clientOptional.isEmpty()) {
             throw new EntityNotFoundException(
                     "Aucun client n'a ete trouve avec l'ID " + idClient, ErrorCode.CLIENT_NOT_FOUND);
         }
-        commandeClientDto.setClientDto(ClientDto.fromEntity(clientOptional.get()));
 
-        return CmdeClientDto.fromEntity(
-                cmdeClientRepository.save(CmdeClientDto.toEntity(commandeClientDto))
-        );
+        // Associer le client à la commande
+        cmdeClient.setClient(client);
 
+        // Sauvegarder la commande mise à jour
+        CmdeClient savedCmdeClient = cmdeClientRepository.save(cmdeClient);
+
+
+        return CmdeClientDto.fromEntity(savedCmdeClient);
 
     }
 
@@ -194,28 +310,39 @@ public class CmdeClientServiceImpl implements CmdeClientService {
         checkIdCommande(idCommande);
         checkIdLigneCommande(idLigneCommande);
 
-        CmdeClientDto commandeClientDto= checkEtatCommande(idCommande);
-        // Just to check the LigneCommandeClient and inform the client in case it is absent
-        ligneCmdeClientRepository.findById(idLigneCommande);
+        CmdeClientDto commandeClientDto = checkEtatCommande(idCommande);
+        
+        // Vérifier que la modification est autorisée selon l'état
+        if (commandeClientDto.getEtatCommande() == EtatCmde.LIVREE) {
+            throw new InvalidOperationException(
+                "Impossible de supprimer un article d'une commande livrée",
+                ErrorCode.CMDE_CLIENT_NON_MODIFIABLE
+            );
+        }
+        
+        // Vérifier que la ligne de commande existe et appartient à cette commande
+        LigneCmdeClient ligneCommande = ligneCmdeClientRepository.findById(idLigneCommande)
+            .orElseThrow(() -> new EntityNotFoundException(
+                "Ligne de commande non trouvée avec l'ID " + idLigneCommande,
+                ErrorCode.lIGNE_CMDE_CLIENT_NOT_FOUND
+            ));
+            
+        // Vérifier que la ligne appartient bien à cette commande
+        if (!ligneCommande.getCmdeClient().getId().equals(idCommande)) {
+            throw new InvalidOperationException(
+                "La ligne de commande ne correspond pas à cette commande",
+                ErrorCode.CMDE_CLIENT_NON_MODIFIABLE
+            );
+        }
+        
+        // Supprimer la ligne de commande
         ligneCmdeClientRepository.deleteById(idLigneCommande);
+        log.info("Article supprimé de la commande {} (ligne {})", idCommande, idLigneCommande);
 
         return commandeClientDto;
     }
 
-    @Override
-    public CmdeClientDto findById(Integer cmdCltId) {
-        if (cmdCltId == null) {
-            log.error("Commande client ID is NULL");
-            return null;
-        }
-        return
-                cmdeClientRepository
-                        .findById(cmdCltId)
-                        .map(CmdeClientDto::fromEntity)
-                        .orElseThrow(
-                                ()-> new EntityNotFoundException("cmdClt with ID {} "+cmdCltId+"not found ",  ErrorCode.CMDE_CLIENT_NOT_FOUND)
-                        );
-    }
+
 
     @Override
     public CmdeClientDto findByCode(String code) {
@@ -257,9 +384,31 @@ public class CmdeClientServiceImpl implements CmdeClientService {
             return null;
         }
 
-        //le orElseThrow()  par defaut leve une eexception NoSuchElementFound
-        CmdeClient cmdeClient = cmdeClientRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("cmdClient not found with ID " + id));
+        // Vérifier que la commande existe
+        CmdeClient cmdeClient = cmdeClientRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException(
+                "Commande client non trouvée avec l'ID " + id, 
+                ErrorCode.CMDE_CLIENT_NOT_FOUND
+            ));
+        
+        // Vérifier que la commande peut être supprimée (pas livrée)
+        if (cmdeClient.getEtatCommande() == EtatCmde.LIVREE) {
+            throw new InvalidOperationException(
+                "Impossible de supprimer une commande livrée",
+                ErrorCode.CMDE_CLIENT_NON_MODIFIABLE
+            );
+        }
+        
+        // Supprimer d'abord toutes les lignes de commande
+        List<LigneCmdeClient> lignesCommande = ligneCmdeClientRepository.findAllByCmdeClientId(id);
+        if (!lignesCommande.isEmpty()) {
+            log.info("Suppression de {} lignes de commande pour la commande {}", lignesCommande.size(), id);
+            ligneCmdeClientRepository.deleteAll(lignesCommande);
+        }
+        
+        // Puis supprimer la commande
         cmdeClientRepository.delete(cmdeClient);
+        log.info("Commande client {} supprimée avec succès", id);
 
         return CmdeClientDto.fromEntity(cmdeClient);
     }
@@ -281,6 +430,21 @@ public class CmdeClientServiceImpl implements CmdeClientService {
             throw new InvalidOperationException("Impossible de modifier la commande lorsqu'elle est livree", ErrorCode.CMDE_CLIENT_NON_MODIFIABLE);
         }
         return commandeClientDto;
+    }
+
+    @Override
+    public CmdeClientDto findById(Integer cmdCltId) {
+        if (cmdCltId == null) {
+            log.error("Commande client ID is NULL");
+            return null;
+        }
+        return
+                cmdeClientRepository
+                        .findById(cmdCltId)
+                        .map(CmdeClientDto::fromEntity)
+                        .orElseThrow(
+                                ()-> new EntityNotFoundException("cmdClt with ID {} "+cmdCltId+"not found ",  ErrorCode.CMDE_CLIENT_NOT_FOUND)
+                        );
     }
 
     private void checkIdCommande(Integer idCommande) {

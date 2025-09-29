@@ -7,6 +7,8 @@ spring:
     swagger-ui:
       path: /swagger-ui.html
 
+  profiles:
+    active: ${ACTIVE_PROFILE:dev}
 
 
   datasource:
@@ -29,6 +31,34 @@ spring:
     level:
       org.springframework: DEBUG
 
+
+#####################################################################################3
+
+
+  mail:
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT}
+    username: ${SMTP_USER}
+    password: ${SMTP_PASSWORD}
+
+    properties:
+      mail:
+        mine:
+          charset: UTF
+        smtp:
+          writetimeout: 10000
+          connectiontimeout: 10000
+          timeout: 10000
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: ${SMTP_SSL_TRUST}
+    verify:
+      host: ${VERIFY_EMAIL_HOSt}
+
+
+#####################################################################################3
 # Configuration MinIO pour la gestion des photos
 minio:
   endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
