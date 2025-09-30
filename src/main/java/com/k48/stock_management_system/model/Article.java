@@ -24,6 +24,8 @@ public class Article extends AbstractEntity{
 
     private BigDecimal prixUnitaireTTc;
 
+    private Integer seuilMinimum;
+
     //private Integer idEntreprise;
 
     @Column(name = "urlPhoto")

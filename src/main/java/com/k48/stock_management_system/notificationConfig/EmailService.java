@@ -34,9 +34,25 @@ public class EmailService {
 
     private String buildHtmlReminder(String content) {
         return "<html><body>" +
-                "<h2>Rappel de Rendez-vous</h2>" +
+                "<h2>Notification</h2>" +
                 "<p>" + content + "</p>" +
                 "</body></html>";
+    }
+    
+    public void sendSupplierOrderEmail(String to, String subject, String content) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(content);
+        mailSender.send(message);
+    }
+    
+    public void sendClientConfirmationEmail(String to, String subject, String content) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(content);
+        mailSender.send(message);
     }
 
     public void sendCancellationEmail(String email, String subject, String content) {

@@ -31,6 +31,8 @@ public class ArticleDto {
 
     private BigDecimal prixUnitaireTTc;
 
+    private Integer seuilMinimum;
+
     private Integer entrepriseId;
 
     private Integer categoryId;
@@ -58,6 +60,7 @@ public class ArticleDto {
                 .prixUnitaireHT(article.getPrixUnitaireHT())
                 .tauxTva(article.getTauxTva())
                 .prixUnitaireTTc(article.getPrixUnitaireTTc())
+                .seuilMinimum(article.getSeuilMinimum())
                 .entrepriseId(article.getEntreprise() != null ? article.getEntreprise().getId() : null)
                 .categoryId(article.getCategory() != null ? article.getCategory().getId() : null)
                 .build();
@@ -77,6 +80,7 @@ public class ArticleDto {
                 .prixUnitaireHT(articleDto.getPrixUnitaireHT())
                 .prixUnitaireTTc(articleDto.getPrixUnitaireTTc())
                 .tauxTva(articleDto.getTauxTva())
+                .seuilMinimum(articleDto.getSeuilMinimum())
                 .category(articleDto.getCategoryId() != null ?
                     Category.builder().id(articleDto.getCategoryId()).build() : null)
                 .entreprise(articleDto.getEntrepriseId()!= null ?

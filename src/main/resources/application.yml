@@ -31,9 +31,7 @@ spring:
     level:
       org.springframework: DEBUG
 
-
 #####################################################################################3
-
 
   mail:
     host: ${SMTP_HOST}
@@ -67,6 +65,13 @@ minio:
   bucket-name: ${MINIO_BUCKET_NAME:stock-photos}
   init:
     enabled: ${MINIO_INIT_ENABLED:false}
+
+#Configuration JWT
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
+  expiration: ${JWT_EXPIRATION}
+
 
 server:
   port: 8081

@@ -1,8 +1,8 @@
 package com.k48.stock_management_system.notificationConfig;
 
 
-import com.groupe.gestion_clinic.dto.NotificationDto;
-import com.groupe.gestion_clinic.model.Rendezvous;
+import com.k48.stock_management_system.dto.NotificationDto;
+import com.k48.stock_management_system.model.Article;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -50,42 +50,32 @@ public class NotificationService {
     }
 
 
-    // Envoi de rappel de RDV
-    public void sendRappelRendezVous(Rendezvous rdv) {
-        // Notification UI
+    // Notification de stock faible
+    public void sendStockAlert(Article article, Integer currentStock, Integer minStock) {
         NotificationDto notif = new NotificationDto(
-                "RDV_REMINDER",
-                "Rappel: RDV avec " + rdv.getPatient().getNom() + " à " + rdv.getDateHeureDebut().toLocalTime(),
-                rdv.getId(),
+                "STOCK_ALERT",
+                "Stock faible pour l'article: " + article.getDesignation() + " (Stock: " + currentStock + ", Min: " + minStock + ")",
+                article.getId(),
                 LocalDateTime.now(),
-                "MEDECIN",
-                rdv.getMedecin().getId().longValue()
+                "ADMIN",
+                null
         );
 
-        sendPrivateNotification(rdv.getMedecin().getId().longValue(), notif);
+        sendPublicNotification(notif);
+    }
 
-        // Email au médecin
-        emailService.sendReminderEmail(
-                                        rdv.getMedecin().getEmail(),
-                                        "Rappel de rendez-vous",
-                                        "Rappel: RDV avec " +
-                                                rdv.getPatient().getNom() + " à " +
-                                                rdv.getDateHeureDebut().toLocalTime()
-
+    // Notification de nouvelle commande
+    public void sendNewOrderNotification(Integer orderId, String orderType, Long userId) {
+        NotificationDto notif = new NotificationDto(
+                "NEW_ORDER",
+                "Nouvelle commande " + orderType + " créée (ID: " + orderId + ")",
+                orderId,
+                LocalDateTime.now(),
+                "USER",
+                userId
         );
 
-        // Notification + email au patient
-        NotificationDto patientNotif = new NotificationDto(
-                    "RDV_REMINDER",
-                    "Rappel: RDV avec "+rdv.getMedecin().getNom()+rdv.getDateHeureDebut().toLocalTime(),
-                    rdv.getId(), LocalDateTime.now(),"PATIENT",rdv.getMedecin().getId().longValue()
-                );
-
-        sendPrivateNotification(rdv.getPatient().getId().longValue(), patientNotif);
-        emailService.sendReminderEmail(
-                                        rdv.getMedecin().getEmail(),
-                                        "Rappel de rendez-vous",
-                                        "Rappel : RDV avec "+rdv.getMedecin().getNom()+" a "+rdv.getDateHeureDebut().toLocalTime());
+        sendPrivateNotification(userId, notif);
     }
 
 

@@ -60,8 +60,8 @@ public class MvtStockServiceImpl implements MvtStockService {
     public MvtStockDto correctionStockNeg(MvtStockDto dto) {
         return sortieNegative(dto, TypeMvtStock.CORRECTION_NEG);
     }
+    
     private MvtStockDto entreePositive(MvtStockDto dto, TypeMvtStock typeMvtStock) {
-
         objectValidator.validate(dto);
 
         dto.setQuantite(
@@ -76,7 +76,6 @@ public class MvtStockServiceImpl implements MvtStockService {
     }
 
     private MvtStockDto sortieNegative(MvtStockDto dto, TypeMvtStock typeMvtStock) {
-
         objectValidator.validate(dto);
 
         dto.setQuantite(

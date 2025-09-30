@@ -5,8 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -16,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Utilisateur extends AbstractEntity {
+public class Utilisateur extends AbstractEntity implements UserDetails {
 
     private String nom;
 
@@ -37,7 +41,31 @@ public class Utilisateur extends AbstractEntity {
     @JoinColumn(name = "entrepriseId")
     private Entreprise entreprise;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "utilisateur")
-    @JsonIgnore
-    private List<Roles> roles;
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Retourne une liste de GrantedAuthority basée sur le rôle de l'utilisateur.
+        // Spring Security attend des rôles préfixés par "ROLE_".
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+    }
+
+    @Override
+    public String getPassword() {return motDePasse;}
+
+    @Override
+    public String getUsername() {return email;}
+
+    @Override
+    public boolean isAccountNonExpired() {return true;}
+
+    @Override
+    public boolean isAccountNonLocked() {return true;}
+
+    @Override
+    public boolean isCredentialsNonExpired() {return true;}
+
+    @Override
+    public boolean isEnabled() {return true;}
 }

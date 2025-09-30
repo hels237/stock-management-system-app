@@ -35,6 +35,7 @@ public class LigneCmdeFournisseurDto {
         }
         return LigneCmdeFournisseurDto
                 .builder()
+                .id(ligneCmdeFournisseur.getId())
                 .prixUnitaire(ligneCmdeFournisseur.getPrixUnitaire())
                 .quantite(ligneCmdeFournisseur.getQuantite())
                 .articleDto(ArticleDto.fromEntity(ligneCmdeFournisseur.getArticle()))

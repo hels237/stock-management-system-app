@@ -12,6 +12,7 @@ import com.k48.stock_management_system.repositories.LigneCmdeClientRepository;
 import com.k48.stock_management_system.services.CmdeClientService;
 import com.k48.stock_management_system.services.MvtStockService;
 import com.k48.stock_management_system.validator.ObjectValidator;
+import com.k48.stock_management_system.notificationConfig.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class CmdeClientServiceImpl implements CmdeClientService {
     private final MvtStockService mvtStockService;
     private final ObjectValidator<CmdeClientDto> objectValidator;
     private final ObjectValidator<ArticleDto> articleValidator;
+    private final EmailService emailService;
 
 
 
@@ -99,6 +101,9 @@ public class CmdeClientServiceImpl implements CmdeClientService {
         // if everything is good save the cmdClient
         cmdeClient = cmdeClientRepository.save(cmdeClient);
         final CmdeClient finalSavedCmdeClient = cmdeClient;
+        
+        // Envoyer email de confirmation au client
+        envoyerEmailConfirmationClient(client, cmdeClient);
 
         // save the LineCmdClient we can't persist the ligneCmdeClient without knowing  whose cmdClient it's belong to
         if(cmdeClientDto.getLigneCmdeClientDtos() != null) {
@@ -176,6 +181,11 @@ public class CmdeClientServiceImpl implements CmdeClientService {
         
         cmdeClient.setEtatCommande(etatCommande);
         CmdeClient savedCmdClt = cmdeClientRepository.save(cmdeClient);
+        
+        // Envoyer notification selon l'état
+        if (etatCommande == EtatCmde.VALIDEE) {
+            envoyerEmailValidationClient(savedCmdClt.getClient(), savedCmdClt);
+        }
 
         return CmdeClientDto.fromEntity(savedCmdClt);
     }
@@ -477,6 +487,38 @@ public class CmdeClientServiceImpl implements CmdeClientService {
         ligneCommandeClients.forEach(lig -> {
             effectuerSortie(lig);
         });
+    }
+    
+    private void envoyerEmailConfirmationClient(Client client, CmdeClient commande) {
+        try {
+            String subject = "Confirmation de votre commande #" + commande.getCode();
+            String content = buildEmailConfirmationContent(client, commande);
+            emailService.sendConfirmationEmail(client.getEmail(), subject, content);
+            log.info("Email de confirmation envoyé au client {} pour la commande {}", client.getEmail(), commande.getCode());
+        } catch (Exception e) {
+            log.error("Erreur lors de l'envoi de l'email de confirmation au client {}: {}", client.getEmail(), e.getMessage());
+        }
+    }
+    
+    private void envoyerEmailValidationClient(Client client, CmdeClient commande) {
+        try {
+            String subject = "Votre commande #" + commande.getCode() + " a été validée";
+            String content = "Bonjour " + client.getNom() + ",\n\n" +
+                           "Votre commande #" + commande.getCode() + " a été validée et sera bientôt prête.\n\n" +
+                           "Cordialement,\nL'équipe";
+            emailService.sendConfirmationEmail(client.getEmail(), subject, content);
+            log.info("Email de validation envoyé au client {} pour la commande {}", client.getEmail(), commande.getCode());
+        } catch (Exception e) {
+            log.error("Erreur lors de l'envoi de l'email de validation au client {}: {}", client.getEmail(), e.getMessage());
+        }
+    }
+    
+    private String buildEmailConfirmationContent(Client client, CmdeClient commande) {
+        return "Bonjour " + client.getNom() + ",\n\n" +
+               "Nous avons bien reçu votre commande #" + commande.getCode() + ".\n" +
+               "Date de commande: " + commande.getDateCmde() + "\n\n" +
+               "Votre commande est actuellement en préparation.\n\n" +
+               "Merci pour votre confiance,\nL'équipe";
     }
 
 

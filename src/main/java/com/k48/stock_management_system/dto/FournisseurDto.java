@@ -35,6 +35,7 @@ public class FournisseurDto {
         }
         return FournisseurDto.
                 builder()
+                .id(fournisseur.getId())
                 .nom(fournisseur.getNom())
                 .email(fournisseur.getEmail())
                 .prenom(fournisseur.getPrenom())

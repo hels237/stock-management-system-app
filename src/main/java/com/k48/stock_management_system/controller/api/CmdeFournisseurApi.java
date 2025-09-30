@@ -93,7 +93,7 @@ public interface CmdeFournisseurApi {
             @ApiResponse(responseCode = "404", description = "Aucune commande fournisseur trouvée avec le code fourni")
     })
     @Operation(summary = "Trouver une commande fournisseur par code", description = "Permet de récupérer une commande fournisseur en fonction de son code")
-    @GetMapping("/{codeCommandeFournisseur}")
+    @GetMapping("/code/{codeCommandeFournisseur}")
     CmdeFournisseurDto findByCode(@PathVariable("codeCommandeFournisseur") String code);
 
 

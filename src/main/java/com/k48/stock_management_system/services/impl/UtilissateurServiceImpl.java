@@ -9,6 +9,7 @@ import com.k48.stock_management_system.repositories.UtilisateurRepository;
 import com.k48.stock_management_system.services.UtilisateurService;
 import com.k48.stock_management_system.validator.ObjectValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,11 +21,17 @@ public class UtilissateurServiceImpl  implements UtilisateurService {
 
     private final ObjectValidator<UtilisateurDto> objectValidator;
     private final UtilisateurRepository utilisateurRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Override
     public UtilisateurDto save(UtilisateurDto utilisateurDto) {
         objectValidator.validate(utilisateurDto);
+        
+        // Encoder le mot de passe avant la sauvegarde
+        if (utilisateurDto.getMotDePasse() != null) {
+            utilisateurDto.setMotDePasse(passwordEncoder.encode(utilisateurDto.getMotDePasse()));
+        }
 
         return UtilisateurDto.fromEntity(utilisateurRepository.save(UtilisateurDto.toEntity(utilisateurDto)));
     }

@@ -1,5 +1,7 @@
 package com.k48.stock_management_system.model;
 
 public enum Role {
-    ADMIN,FOURNISSEUR,CLIENT
+    ADMIN,
+    CLIENT,
+    FOURNISSEUR
 }

@@ -41,6 +41,7 @@ public class CmdeFournisseurDto {
                 .dateCmde(cmdeFournisseur.getDateCmde())
                 .entrepriseId(cmdeFournisseur.getIdEntreprise())
                 .etatCommande(cmdeFournisseur.getEtatCommande())
+                .ligneCmdeFournisseurDtos(cmdeFournisseur.getLigneCmdeFournisseur().stream().map(LigneCmdeFournisseurDto::fromEntity).toList())
                 .fournisseurDto(FournisseurDto.fromEntity(cmdeFournisseur.getFournisseur()))
                 .build();
     }
@@ -53,7 +54,10 @@ public class CmdeFournisseurDto {
         return CmdeFournisseur.
                 builder()
                 .code(cmdeFournisseurDto.getCode())
+                .etatCommande(cmdeFournisseurDto.getEtatCommande())
+                .ligneCmdeFournisseur(cmdeFournisseurDto.getLigneCmdeFournisseurDtos().stream().map(LigneCmdeFournisseurDto::toEntity).toList())
                 .dateCmde(cmdeFournisseurDto.getDateCmde())
+                .fournisseur(FournisseurDto.toEntity(cmdeFournisseurDto.getFournisseurDto()))
                 .idEntreprise(cmdeFournisseurDto.getEntrepriseId())
                 .build();
     }

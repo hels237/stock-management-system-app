@@ -12,6 +12,8 @@ import com.k48.stock_management_system.repositories.LigneCmdeFournisseurReposito
 import com.k48.stock_management_system.services.CmdeFournisseurService;
 import com.k48.stock_management_system.services.MvtStockService;
 import com.k48.stock_management_system.validator.ObjectValidator;
+import com.k48.stock_management_system.notificationConfig.EmailService;
+import com.k48.stock_management_system.notificationConfig.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,8 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
     private final LigneCmdeFournisseurRepository ligneCmdeFournisseurRepository;
     private final MvtStockService mvtStkService;
     private final ObjectValidator<ArticleDto> objectValidatorArticleDto;
+    private final EmailService emailService;
+
 
     @Override
     public CmdeFournisseurDto save(CmdeFournisseurDto cmdFournisseurDto) {
@@ -98,6 +102,12 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
         // save the cmdeFournisseur
         CmdeFournisseur cmdSaved = cmdeFournisseurRepository.save(cmdeFournisseur);
         final CmdeFournisseur finalSavedCmdeFournisseur = cmdSaved;
+        
+        // Envoyer email au fournisseur
+        envoyerEmailCommandeFournisseur(supplier, cmdSaved);
+        
+        // Envoyer email au fournisseur
+        envoyerEmailCommandeFournisseur(supplier, cmdSaved);
 
         // save the LineCmdeFournisseur
         if(cmdFournisseurDto.getLigneCmdeFournisseurDtos() != null) {
@@ -133,13 +143,13 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
     public CmdeFournisseurDto findByCode(String code) {
         if (!StringUtils.hasLength(code)) {
             log.error("Commande fournisseur CODE is NULL");
-            return cmdeFournisseurRepository.findByCode(code)
-                    .map(CmdeFournisseurDto::fromEntity)
-                    .orElseThrow(() -> new EntityNotFoundException(
-                            "Aucune commande fournisseur n'a ete trouve avec le CODE " + code, ErrorCode.CMDE_FOURNISSEUR_NOT_FOUND
-                    ));
+            return null;
         }
-        return null;
+        return cmdeFournisseurRepository.findByCode(code)
+                .map(CmdeFournisseurDto::fromEntity)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Aucune commande fournisseur n'a ete trouve avec le CODE " + code, ErrorCode.CMDE_FOURNISSEUR_NOT_FOUND
+                ));
     }
 
     @Override
@@ -158,9 +168,13 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
 
     @Override
     public List<LigneCmdeFournisseurDto> findAllLignesCommandesFournisseurByCommandeFournisseurId(Integer idCommande) {
+        if (idCommande == null) {
+            log.error("ID commande is NULL");
+            throw new InvalidOperationException("ID commande ne peut pas être null", ErrorCode.CMDE_FOURNISSEUR_NON_MODIFIABLE);
+        }
         return ligneCmdeFournisseurRepository.findAllByCmdeFournisseurId(idCommande).stream()
                 .map(LigneCmdeFournisseurDto::fromEntity)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -216,9 +230,9 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
         // Appliquer la logique métier selon le nouvel état
         switch (etatCommande) {
             case VALIDEE:
-                // Vérifier que la commande a des lignes
-                if (commandeFournisseurDto.getLigneCmdeFournisseurDtos() == null || 
-                    commandeFournisseurDto.getLigneCmdeFournisseurDtos().isEmpty()) {
+                // Vérifier que la commande a des lignes (charger depuis la DB)
+                List<LigneCmdeFournisseur> lignesCommande = ligneCmdeFournisseurRepository.findAllByCmdeFournisseurId(idCommande);
+                if (lignesCommande.isEmpty()) {
                     throw new InvalidOperationException(
                         "Impossible de valider une commande sans articles",
                         ErrorCode.CMDE_FOURNISSEUR_NON_MODIFIABLE
@@ -248,6 +262,16 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
         
         cmdeFournisseur.setEtatCommande(etatCommande);
         CmdeFournisseur savedCmdFournisseur = cmdeFournisseurRepository.save(cmdeFournisseur);
+        
+        // Envoyer notification selon l'état
+        if (etatCommande == EtatCmde.VALIDEE) {
+            envoyerEmailValidationFournisseur(savedCmdFournisseur.getFournisseur(), savedCmdFournisseur);
+        }
+        
+        // Envoyer notification selon l'état
+        if (etatCommande == EtatCmde.VALIDEE) {
+            envoyerEmailValidationFournisseur(savedCmdFournisseur.getFournisseur(), savedCmdFournisseur);
+        }
 
         return CmdeFournisseurDto.fromEntity(savedCmdFournisseur);
     }
@@ -262,6 +286,7 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
             case EN_PREPARATION -> nouvelEtat == EtatCmde.VALIDEE;
             case VALIDEE -> nouvelEtat == EtatCmde.LIVREE;
             case LIVREE -> false; // Aucune transition possible depuis LIVREE
+            default -> false;
         };
     }
     
@@ -275,14 +300,18 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
         checkIdCommande(idCommande);
         checkIdLigneCommande(idLigneCommande);
 
-        if (quantite == null || quantite.compareTo(BigDecimal.ZERO) == 0) {
-            log.error("L'ID de la ligne commande is NULL");
-            throw new InvalidOperationException("Impossible de modifier l'etat de la commande avec une quantite null ou ZERO",
+        if (quantite == null || quantite.compareTo(BigDecimal.ZERO) <= 0) {
+            log.error("La quantité est invalide");
+            throw new InvalidOperationException("Impossible de modifier avec une quantité null ou négative",
                     ErrorCode.CMDE_FOURNISSEUR_NON_MODIFIABLE);
         }
 
         CmdeFournisseurDto commandeFournisseurDto = checkEtatCommande(idCommande);
-       LigneCmdeFournisseur ligneCommandeFournisseur = ligneCmdeFournisseurRepository.findById(idLigneCommande).get();
+        LigneCmdeFournisseur ligneCommandeFournisseur = ligneCmdeFournisseurRepository.findById(idLigneCommande)
+            .orElseThrow(() -> new EntityNotFoundException(
+                "Ligne de commande fournisseur non trouvée avec l'ID " + idLigneCommande,
+                ErrorCode.LIGNE_CMDE_FOURNISSEUR_NOT_FOUND
+            ));
 
         ligneCommandeFournisseur.setQuantite(quantite);
         ligneCmdeFournisseurRepository.save(ligneCommandeFournisseur);
@@ -300,15 +329,14 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
                     ErrorCode.CMDE_FOURNISSEUR_NON_MODIFIABLE);
         }
 
-        // Charger la commande existante
+        // Vérifier l'état de la commande et récupérer l'entité
+        checkEtatCommande(idCommande);
+        
         CmdeFournisseur cmdeFournisseur = cmdeFournisseurRepository.findById(idCommande)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Aucune commande fournisseur trouvée avec l'ID " + idCommande,
                         ErrorCode.CMDE_FOURNISSEUR_NOT_FOUND
                 ));
-
-        // Vérifier l'état de la commande (si besoin)
-        checkEtatCommande(idCommande);
 
         // Charger le fournisseur
         Fournisseur fournisseur = fournisseurRepository.findById(idFournisseur)
@@ -334,18 +362,22 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
 
         CmdeFournisseurDto commandeFournisseurDto = checkEtatCommande(idCommande);
 
-        Optional<LigneCmdeFournisseur> ligneCommandeFournisseur = ligneCmdeFournisseurRepository.findById(idLigneCommande);
+        LigneCmdeFournisseur ligneCommandeFournisseur = ligneCmdeFournisseurRepository.findById(idLigneCommande)
+            .orElseThrow(() -> new EntityNotFoundException(
+                "Ligne de commande fournisseur non trouvée avec l'ID " + idLigneCommande,
+                ErrorCode.LIGNE_CMDE_FOURNISSEUR_NOT_FOUND
+            ));
 
-        Optional<Article> articleOptional = articleRepository.findById(idArticle);
-        if (articleOptional.isEmpty()) {
-            throw new EntityNotFoundException(
-                    "Aucune article n'a ete trouve avec l'ID " + idArticle, ErrorCode.ARTICLE_NOT_FOUND);
-        }
+        Article article = articleRepository.findById(idArticle)
+            .orElseThrow(() -> new EntityNotFoundException(
+                "Aucun article trouvé avec l'ID " + idArticle, 
+                ErrorCode.ARTICLE_NOT_FOUND
+            ));
 
-        objectValidatorArticleDto.validate(ArticleDto.fromEntity(articleOptional.get()));
+        objectValidatorArticleDto.validate(ArticleDto.fromEntity(article));
 
-        LigneCmdeFournisseur ligneCommandeFournisseurToSaved = ligneCommandeFournisseur.get();
-        ligneCommandeFournisseurToSaved.setArticle(articleOptional.get());
+        LigneCmdeFournisseur ligneCommandeFournisseurToSaved = ligneCommandeFournisseur;
+        ligneCommandeFournisseurToSaved.setArticle(article);
         ligneCmdeFournisseurRepository.save(ligneCommandeFournisseurToSaved);
 
         return commandeFournisseurDto;
@@ -357,8 +389,15 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
         checkIdLigneCommande(idLigneCommande);
 
         CmdeFournisseurDto commandeFournisseurDto = checkEtatCommande(idCommande);
-        // Just to check the LigneCommandeFournisseur and inform the fournisseur in case it is absent
-        ligneCmdeFournisseurRepository.deleteById(idLigneCommande);
+        
+        // Vérifier que la ligne de commande existe
+        if (!ligneCmdeFournisseurRepository.existsById(idLigneCommande)) {
+            throw new EntityNotFoundException(
+                "Ligne de commande fournisseur non trouvée avec l'ID " + idLigneCommande,
+                ErrorCode.LIGNE_CMDE_FOURNISSEUR_NOT_FOUND
+            );
+        }
+        
         ligneCmdeFournisseurRepository.deleteById(idLigneCommande);
 
         return commandeFournisseurDto;
@@ -413,5 +452,39 @@ public class CmdeFournisseurServiceImpl implements CmdeFournisseurService {
                 .entrepriseId(lig.getIdEntreprise())
                 .build();
         mvtStkService.entreeStock(mvtStkDto);
+    }
+    
+    private void envoyerEmailCommandeFournisseur(Fournisseur fournisseur, CmdeFournisseur commande) {
+        try {
+            String subject = "Nouvelle commande #" + commande.getCode();
+            String content = buildEmailCommandeContent(fournisseur, commande);
+            emailService.sendConfirmationEmail(fournisseur.getEmail(), subject, content);
+            log.info("Email de commande envoyé au fournisseur {} pour la commande {}", fournisseur.getEmail(), commande.getCode());
+        } catch (Exception e) {
+            log.error("Erreur lors de l'envoi de l'email au fournisseur {}: {}", fournisseur.getEmail(), e.getMessage());
+        }
+    }
+    
+    private void envoyerEmailValidationFournisseur(Fournisseur fournisseur, CmdeFournisseur commande) {
+        try {
+            String subject = "Commande #" + commande.getCode() + " validée";
+            String content = "Bonjour,\n\n" +
+                           "La commande #" + commande.getCode() + " a été validée.\n" +
+                           "Merci de préparer la livraison.\n\n" +
+                           "Cordialement,\nL'équipe";
+            emailService.sendConfirmationEmail(fournisseur.getEmail(), subject, content);
+            log.info("Email de validation envoyé au fournisseur {} pour la commande {}", fournisseur.getEmail(), commande.getCode());
+        } catch (Exception e) {
+            log.error("Erreur lors de l'envoi de l'email de validation au fournisseur {}: {}", fournisseur.getEmail(), e.getMessage());
+        }
+    }
+    
+    private String buildEmailCommandeContent(Fournisseur fournisseur, CmdeFournisseur commande) {
+        return "Bonjour,\n\n" +
+               "Nous avons une nouvelle commande pour vous.\n" +
+               "Numéro de commande: #" + commande.getCode() + "\n" +
+               "Date de commande: " + commande.getDateCmde() + "\n\n" +
+               "Merci de traiter cette commande dans les meilleurs délais.\n\n" +
+               "Cordialement,\nL'équipe";
     }
 }
