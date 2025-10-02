@@ -96,8 +96,11 @@ public class SecurityConfig {
                         // Mouvements de stock - ADMIN et FOURNISSEUR
                         .requestMatchers("/gestiondestock/v1/mvtstock/**").hasAnyRole("ADMIN", "FOURNISSEUR")
                         
-                        // Photos - Tous les rôles authentifiés
-                        .requestMatchers("/gestiondestock/v1/photos/**").hasAnyRole("ADMIN", "CLIENT", "FOURNISSEUR")
+                        // Photos upload/delete - Tous les rôles authentifiés
+                        .requestMatchers("/gestiondestock/v1/photos/upload/**", "/gestiondestock/v1/photos/delete/**").hasAnyRole("ADMIN", "CLIENT", "FOURNISSEUR")
+                        
+                        // Photos affichage - Accès public pour le frontend
+                        .requestMatchers("/gestiondestock/v1/photos/*/*/photo").permitAll()
                         
                         .anyRequest().authenticated()
                 )

@@ -14,16 +14,14 @@ import java.util.Arrays;
 import java.util.List;
 
 @RestController
-@RequestMapping("/photos")
+@RequestMapping("/gestiondestock/v1/photos")
 @RequiredArgsConstructor
 public class PhotoController implements PhotoApi {
 
     private final PhotoService photoService;
     
     private static final List<String> ALLOWED_ENTITY_TYPES = Arrays.asList(
-            "article", "utilisateur", "client", "fournisseur", "entreprise"
-    );
-
+            "article", "utilisateur", "client", "fournisseur", "entreprise");
     @Override
     public PhotoUploadResponseDto uploadPhoto(MultipartFile file, String entityType, Integer entityId) {
         validateEntityType(entityType);
@@ -35,6 +33,26 @@ public class PhotoController implements PhotoApi {
     @Override
     public void deletePhoto(String publicId) {
         photoService.deletePhoto(publicId);
+    }
+
+    @Override
+    public org.springframework.http.ResponseEntity<byte[]> getArticlePhoto(Integer id) {
+        return photoService.getEntityPhoto("article", id);
+    }
+
+    @Override
+    public org.springframework.http.ResponseEntity<byte[]> getUtilisateurPhoto(Integer id) {
+        return photoService.getEntityPhoto("utilisateur", id);
+    }
+
+    @Override
+    public org.springframework.http.ResponseEntity<byte[]> getClientPhoto(Integer id) {
+        return photoService.getEntityPhoto("client", id);
+    }
+
+    @Override
+    public org.springframework.http.ResponseEntity<byte[]> getFournisseurPhoto(Integer id) {
+        return photoService.getEntityPhoto("fournisseur", id);
     }
 
     private void validateEntityType(String entityType) {

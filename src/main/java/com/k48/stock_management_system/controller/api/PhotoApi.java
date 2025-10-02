@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,4 +32,36 @@ public interface PhotoApi {
     @Operation(summary = "Supprimer une photo", description = "Permet de supprimer une photo en utilisant son ID public")
     @DeleteMapping("/delete/{publicId}")
     void deletePhoto(@PathVariable("publicId") String publicId);
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Photo de l'article récupérée avec succès"),
+            @ApiResponse(responseCode = "404", description = "Article ou photo non trouvé")
+    })
+    @Operation(summary = "Afficher la photo d'un article", description = "Récupère la photo d'un article par son ID avec mise en cache")
+    @GetMapping("/article/{id}/photo")
+    ResponseEntity<byte[]> getArticlePhoto(@PathVariable("id") Integer id);
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Photo de l'utilisateur récupérée avec succès"),
+            @ApiResponse(responseCode = "404", description = "Utilisateur ou photo non trouvé")
+    })
+    @Operation(summary = "Afficher la photo d'un utilisateur", description = "Récupère la photo d'un utilisateur par son ID avec mise en cache")
+    @GetMapping("/utilisateur/{id}/photo")
+    ResponseEntity<byte[]> getUtilisateurPhoto(@PathVariable("id") Integer id);
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Photo du client récupérée avec succès"),
+            @ApiResponse(responseCode = "404", description = "Client ou photo non trouvé")
+    })
+    @Operation(summary = "Afficher la photo d'un client", description = "Récupère la photo d'un client par son ID avec mise en cache")
+    @GetMapping("/client/{id}/photo")
+    ResponseEntity<byte[]> getClientPhoto(@PathVariable("id") Integer id);
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Photo du fournisseur récupérée avec succès"),
+            @ApiResponse(responseCode = "404", description = "Fournisseur ou photo non trouvé")
+    })
+    @Operation(summary = "Afficher la photo d'un fournisseur", description = "Récupère la photo d'un fournisseur par son ID avec mise en cache")
+    @GetMapping("/fournisseur/{id}/photo")
+    ResponseEntity<byte[]> getFournisseurPhoto(@PathVariable("id") Integer id);
 }
